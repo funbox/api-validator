@@ -27,3 +27,75 @@
 5. Команда сохранит в папке проекта файлы:
 - `src/api-schemas/schemas.json` (содержит схемы);
 - `src/api-schemas/doc-version.txt` (содержит ID коммита, использованного при создании схем). 
+
+## Проверка ответов сервера в Angular-проектах
+
+```javascript
+import schemas from 'api-schemas/schemas';
+import { validateResponse, validationStatus } from '@funbox/api-validator/validate-response';
+
+angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, settings) => {
+  restfulProvider.addInterceptor({
+    postProcessResponse: (respWrapper) => {
+      const response = respWrapper.response;
+
+      const result = validateResponse({
+        method: response.config.method,
+        url: response.config.url,
+        data: response.data,
+        schemas,
+        basePath: settings.apiBase,
+      });
+
+      switch (result.status) {
+        case validationStatus.invalid: {
+          console.log(`Ошибка валидации ${response.config.method} ${response.config.url}`);
+          console.log(result);
+          respWrapper.isSuccessful = false;
+          break;
+        }
+
+        case validationStatus.schemaNotFound: {
+          console.log(`Не найдена схема ${response.config.method} ${response.config.url}.`);
+          respWrapper.isSuccessful = false;
+          break;
+        }
+      }
+    },
+  });
+}]);
+```
+
+## Проверка ответов сервера в React-проектах
+
+```javascript
+import axios from 'axios';
+import settings from 'app/app.settings';
+import schemas from 'api-schemas/schemas';
+import { validateResponse, validationStatus } from '@funbox/api-validator/validate-response';
+
+axios.interceptors.response.use(response => {
+  const result = validateResponse({
+    method: response.config.method,
+    url: response.config.url,
+    data: response.data,
+    schemas,
+    basePath: settings.apiBase,
+  });
+
+  switch (result.status) {
+    case validationStatus.invalid: {
+      console.log(`Ошибка валидации ${response.config.method} ${response.config.url}`);
+      console.log(result);
+      return Promise.reject();
+    }
+
+    case validationStatus.schemaNotFound: {
+      console.log(`Не найдена схема ${response.config.method} ${response.config.url}.`);
+      return Promise.reject();
+    }
+  }
+
+  return response;
+});
+```
