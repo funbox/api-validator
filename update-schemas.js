@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const child_process = require('child_process');
 const protagonist = require('@funbox/protagonist');
+const rimraf = require('rimraf');
 
 function main() {
   const packageJsonPath = path.resolve('package.json');
@@ -26,7 +27,13 @@ function main() {
   const file = (config.file && typeof config.file === 'string') ? sanitizeParam(config.file) : 'doc.apib';
 
   const basePath = path.resolve('src/api-schemas');
-  child_process.execSync(`mkdir -p ${basePath}`);
+  if (!fs.existsSync(basePath)) {
+    const srcPath = path.resolve('src');
+    if (!fs.existsSync(srcPath)) {
+      fs.mkdirSync(srcPath);
+    }
+    fs.mkdirSync(basePath);
+  }
 
   const repoPath = path.resolve(basePath, 'doc_repo');
   if (fs.existsSync(repoPath)) {
@@ -46,7 +53,7 @@ function main() {
   console.log(`Клонируем репозиторий документации в ${repoPath}`);
   child_process.execSync(`git clone -b "${branch}" -q --depth 1 "${remote}" ${repoPath}`);
   const doc = child_process.execSync(`git show ${commitId}:"${file}"`, { cwd: repoPath, encoding: 'utf8' });
-  child_process.execSync(`rm -rf ${repoPath}`);
+  rimraf.sync(repoPath);
 
   console.log(`Парсим ${file}`);
   const ast = protagonist.parseSync(doc);
