@@ -2,13 +2,15 @@
   "name": "@funbox/api-validator",
   "version": "1.2.0",
   "description": "Средство проверки соответствия ответа от сервера документации apib",
-  "main": "index.js",
+  "main": "dist/index.js",
   "bin": {
-    "update-schemas": "./update-schemas.js"
+    "update-schemas": "./src/update-schemas.js"
   },
   "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "./node_modules/.bin/babel src --out-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --cache -c .eslintrc --ext .js ./"
+    "lint": "eslint --cache -c .eslintrc --ext .js ./src"
   },
   "repository": {
     "type": "git",
@@ -16,11 +18,15 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@babel/polyfill": "7.0.0",
     "@funbox/protagonist": "1.6.8-fb-2.0.0",
     "@funbox/tv4": "1.2.7-fb-2.0.0",
     "rimraf": "2.6.2"
   },
   "devDependencies": {
+    "@babel/cli": "7.2.0",
+    "@babel/core": "7.2.0",
+    "@babel/preset-env": "7.2.0",
     "@funbox/eslint-config": "4.3.0",
     "eslint": "5.6.0"
   }

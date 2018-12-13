@@ -67,3 +67,6 @@ Session.vim
 
 # -- ESLint --
 .eslintcache
+
+# -- Build --
+/dist
