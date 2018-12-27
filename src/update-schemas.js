@@ -73,10 +73,48 @@ function main() {
           const schemaElement = response.content.find((obj) => obj.attributes && obj.attributes.contentType === 'application/schema+json');
           if (schemaElement) {
             const method = request.attributes.method;
-            const href = (transition.attributes && transition.attributes.href) ? transition.attributes.href : resource.attributes.href;
+            const transitionAttrs = transition.attributes || {};
+
+            const typesRegExps = {
+              number: '[0-9]+',
+              string: '[^/]+',
+            };
+
+            const variablesRegExps = {};
+
+            if (transitionAttrs.hrefVariables) {
+              transitionAttrs.hrefVariables.content.forEach(variable => {
+                const name = variable.content.key.content;
+                let type = variable.meta.title;
+                if (!(type in typesRegExps)) {
+                  type = 'string';
+                }
+                variablesRegExps[name] = typesRegExps[type];
+              });
+            }
+
+            let href = transitionAttrs.href || resource.attributes.href;
+
+            // Удаляем query-параметры.
+            href = href.replace(/\/?{\?[^}]+}/g, '');
+
+            // Преобразуем URL в массив сегментов для упрощения кода валидации.
+            const urlSegments = href.split('/').filter(s => s.length > 0).map(segment => {
+              let value = segment;
+              const hasVariables = segment.indexOf('{') !== -1;
+              if (hasVariables) {
+                // Экранирование специальных символов сегмента, за исключением "{" и "}".
+                value = value.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
+                // Замена переменных на регулярные выражения.
+                value = value.replace(/{([^}/]+)}/g, (match, name) => variablesRegExps[name] || typesRegExps.string);
+                value = `^${value}$`;
+              }
+              return { isRegExp: hasVariables, value };
+            });
+
             const definition = JSON.parse(schemaElement.content);
             deleteDescriptions(definition);
-            schemas.push({ method, href, definition });
+            schemas.push({ method, urlSegments, definition });
           }
         }
       });
