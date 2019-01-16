@@ -1,4 +1,5 @@
 import tv4 from '@funbox/tv4';
+import getQueryParams from './get-query-params';
 
 export const validationStatus = {
   valid: 'valid',
@@ -7,14 +8,10 @@ export const validationStatus = {
 };
 
 export function validateResponse({ method, url, data, schemas, basePath = '' } = {}) {
-  let normalizedUrl = url;
-
-  // Удаляем basePath.
-  normalizedUrl = normalizedUrl.slice(basePath.length);
-  // Удаляем query-параметры.
-  normalizedUrl = normalizedUrl.split('?')[0];
-
-  const responseUrlSegments = normalizedUrl.split('/').filter(s => s.length > 0);
+  const urlWithoutBasePath = url.slice(basePath.length);
+  const [urlWithoutQueryString, queryString] = urlWithoutBasePath.split('?');
+  const responseUrlSegments = urlWithoutQueryString.split('/').filter(s => s.length > 0);
+  const responseQueryParams = getQueryParams(queryString);
 
   let foundSchemas = schemas.filter(schema => (
     schema.method === method
@@ -50,6 +47,36 @@ export function validateResponse({ method, url, data, schemas, basePath = '' } =
     }
     foundSchemas = matchingSchemas;
   });
+
+  let maxMatchedStaticQueryParamsCount = 0;
+
+  // Оставляем схемы, статичные query-параметры которых присутствуют в URL ответа.
+  foundSchemas = foundSchemas.filter(schema => {
+    const allStaticParamsArePresent = schema.staticQueryParams.every(staticParam => (
+      responseQueryParams.find(responseParam => (
+        responseParam.name === staticParam.name && responseParam.value === staticParam.value
+      ))
+    ));
+    if (allStaticParamsArePresent && schema.staticQueryParams.length > maxMatchedStaticQueryParamsCount) {
+      maxMatchedStaticQueryParamsCount = schema.staticQueryParams.length;
+    }
+    return allStaticParamsArePresent;
+  });
+
+  // Оставляем схемы с максимальным количеством совпавших статичных query-параметров.
+  foundSchemas = foundSchemas.filter(schema => schema.staticQueryParams.length === maxMatchedStaticQueryParamsCount);
+
+  // Оставляем схемы, обязательные динамические query-параметры которых присутствуют в URL ответа.
+  foundSchemas = foundSchemas.filter(schema => (
+    schema.requiredDynamicQueryParams.every(schemaParamName => (
+      responseQueryParams.find(responseParam => (
+        responseParam.name === schemaParamName
+      ))
+    ))
+  ));
+
+  // Первой окажется схема, у которой больше всего обязательных динамических query-параметров.
+  foundSchemas.sort((schemaA, schemaB) => (schemaB.requiredDynamicQueryParams.length - schemaA.requiredDynamicQueryParams.length));
 
   if (foundSchemas.length === 0) {
     return { status: validationStatus.schemaNotFound };

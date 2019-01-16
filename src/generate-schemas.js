@@ -1,3 +1,5 @@
+import getQueryParams from './get-query-params';
+
 const protagonist = require('@funbox/protagonist');
 
 module.exports = function generateSchemas(doc) {
@@ -20,12 +22,22 @@ module.exports = function generateSchemas(doc) {
             const method = request.attributes.method;
             const transitionAttrs = transition.attributes || {};
 
+            const href = transitionAttrs.href || resource.attributes.href;
+            const hrefWithoutDynamicQueryParams = href.replace(/{[?&][^}]+}/, '');
+
+            const [hrefWithoutStaticQueryParams, staticQueryString] = hrefWithoutDynamicQueryParams.split('?');
+            const staticQueryParams = getQueryParams(staticQueryString);
+
+            const dynamicQueryParamsMatch = href.match(/{[?&]([^}]+)}/);
+            const dynamicQueryParams = dynamicQueryParamsMatch ? dynamicQueryParamsMatch[1].split(',') : [];
+
             const typesRegExps = {
               number: '[0-9]+',
               string: '[^/]+',
             };
 
             const variablesRegExps = {};
+            const requiredVariables = [];
 
             if (transitionAttrs.hrefVariables) {
               transitionAttrs.hrefVariables.content.forEach(variable => {
@@ -35,16 +47,17 @@ module.exports = function generateSchemas(doc) {
                   type = 'string';
                 }
                 variablesRegExps[name] = typesRegExps[type];
+
+                if (variable.attributes.typeAttributes.indexOf('required') >= 0) {
+                  requiredVariables.push(name);
+                }
               });
             }
 
-            let href = transitionAttrs.href || resource.attributes.href;
-
-            // Удаляем query-параметры.
-            href = href.replace(/\/?{\?[^}]+}/g, '');
+            const requiredDynamicQueryParams = dynamicQueryParams.filter(param => requiredVariables.indexOf(param) >= 0);
 
             // Преобразуем URL в массив сегментов для упрощения кода валидации.
-            const urlSegments = href.split('/').filter(s => s.length > 0).map(segment => {
+            const urlSegments = hrefWithoutStaticQueryParams.split('/').filter(s => s.length > 0).map(segment => {
               let value = segment;
               const hasVariables = segment.indexOf('{') !== -1;
               if (hasVariables) {
@@ -59,7 +72,7 @@ module.exports = function generateSchemas(doc) {
 
             const definition = JSON.parse(schemaElement.content);
             deleteDescriptions(definition);
-            schemas.push({ method, urlSegments, definition });
+            schemas.push({ method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
           }
         }
       });

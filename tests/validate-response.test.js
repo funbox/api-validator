@@ -136,4 +136,301 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
+
+  describe('dynamic and static query params', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# GET /foo
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + withoutParam (string, required)
+
+# GET /foo{?param}
+
++ Parameters
+    + param (string, required)
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + withDynamicParam (string, required)
+
+# GET /foo?param=staticValue
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + withStaticParam (string, required)
+
+# GET /foo?param=staticValue&param2
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + withTwoStaticParams (string, required)
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('without param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo',
+        data: {
+          status: 'ok',
+          withoutParam: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('with dynamic param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?param=dynamicValue',
+        data: {
+          status: 'ok',
+          withDynamicParam: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('with static param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?param=staticValue',
+        data: {
+          status: 'ok',
+          withStaticParam: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('with two static params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?param=staticValue&param2',
+        data: {
+          status: 'ok',
+          withTwoStaticParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('with two static params - different order of params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?param2&param=staticValue',
+        data: {
+          status: 'ok',
+          withTwoStaticParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('with two static params and some unknown param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?param=staticValue&param2&unknown=x',
+        data: {
+          status: 'ok',
+          withTwoStaticParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+  });
+
+  describe('should select schema that has the biggest number of matched required dynamic query parameters', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# GET /foo
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + noRequiredDynamicParams (string, required)
+
+# GET /foo{?a,someOptionalDynamicParam}
+
++ Parameters
+    + a (string, required)
+    + someOptionalDynamicParam (string, optional)
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + oneRequiredDynamicParam (string, required)
+
+# GET /foo{?a,b}
+
++ Parameters
+    + a (string, required)
+    + b (string, required)
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + twoRequiredDynamicParams (string, required)
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('zero required dynamic params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo',
+        data: {
+          status: 'ok',
+          noRequiredDynamicParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('zero required dynamic params + some unknown params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?unknown1=x&unknown2=y',
+        data: {
+          status: 'ok',
+          noRequiredDynamicParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('one required dynamic param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?a=1',
+        data: {
+          status: 'ok',
+          oneRequiredDynamicParam: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('one required dynamic param + one optional dynamic param', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?a=1&someOptionalDynamicParam',
+        data: {
+          status: 'ok',
+          oneRequiredDynamicParam: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('two required dynamic params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo?a=1&b=1',
+        data: {
+          status: 'ok',
+          twoRequiredDynamicParams: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+  });
+
+  it('handles arrays in parameters', () => {
+    const doc = `
+# Get arrays [GET /arrays/{?foo,bar}]
++ Parameters
+    + foo: [1,2] (string, required) - array with two numbers
+    + bar: [1,2] (string, required) - array with two numbers
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+      `;
+    const schemas = generateSchemas(doc);
+    const result = validateResponse({
+      method: 'GET',
+      url: '/arrays?foo[]=1&foo[]=2&bar[0]=3&bar[1]=4',
+      data: {
+        status: 'ok',
+      },
+      schemas,
+    });
+    assert.equal(result.status, validationStatus.valid);
+  });
+
+  describe('ampersand in query parameters', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# Get arrays [GET /foo/{varone}?path=test{&vartwo,varthree}]
++ Parameters
+    + varone (number, required)
+    + vartwo (string, required)
+    + varthree (string, required)
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('valid', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo/2?path=test&vartwo=hello&varthree=world}',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('valid - different order of query params', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo/29?varthree=world&path=test&vartwo=hello}',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('schemaNotFound (no varthree)', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/foo/2?path=test&vartwo=hello}',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
 });
