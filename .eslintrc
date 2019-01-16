@@ -6,5 +6,10 @@
         "extensions": [".js", ".node"]
       }
     }
+  },
+  "globals": {
+    "describe": true,
+    "it": true,
+    "beforeEach": true
   }
 }
