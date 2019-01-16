@@ -6,7 +6,7 @@ export const validationStatus = {
   schemaNotFound: 'schemaNotFound',
 };
 
-export function validateResponse({ method, url, data, schemas, basePath } = {}) {
+export function validateResponse({ method, url, data, schemas, basePath = '' } = {}) {
   let normalizedUrl = url;
 
   // Удаляем basePath.
