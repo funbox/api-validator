@@ -4,7 +4,7 @@
   "description": "Средство проверки соответствия ответа от сервера документации apib",
   "main": "dist/index.js",
   "bin": {
-    "update-schemas": "./src/update-schemas.js"
+    "update-schemas": "./dist/update-schemas.js"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
