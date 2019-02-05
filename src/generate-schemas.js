@@ -42,7 +42,7 @@ module.exports = function generateSchemas(doc) {
             if (transitionAttrs.hrefVariables) {
               transitionAttrs.hrefVariables.content.forEach(variable => {
                 const name = variable.content.key.content;
-                let type = variable.meta.title;
+                let type = variable.meta ? variable.meta.title : '';
                 if (!(type in typesRegExps)) {
                   type = 'string';
                 }

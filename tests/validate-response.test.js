@@ -433,4 +433,26 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
+
+  it('handles parameters without attributes', () => {
+    // Проверяем, что корректно обрабатывается параметр hello, у которого в Parameters не указаны атрибуты в скобках.
+    const doc = `
+# GET /foo{?hello}
++ Parameters
+    + hello
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+      `;
+    const schemas = generateSchemas(doc);
+    const result = validateResponse({
+      method: 'GET',
+      url: '/foo?hello=world',
+      data: {
+        status: 'ok',
+      },
+      schemas,
+    });
+    assert.equal(result.status, validationStatus.valid);
+  });
 });
