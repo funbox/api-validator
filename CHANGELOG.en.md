@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 (05.02.2019)
+
+* Add support of query parameters.
+
 ## 1.5.0 (09.01.2019)
 
 * Add support of node.js v10.
