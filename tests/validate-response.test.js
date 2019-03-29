@@ -455,4 +455,100 @@ describe('validateResponse', () => {
     });
     assert.equal(result.status, validationStatus.valid);
   });
+
+  describe('enums in parameters', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# GET /users/{order}
++ Parameters
+    + order (enum, required)
+        + Members
+            + name
+            + age
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + type: order (required, fixed)
+
+# GET /users/{filter}
++ Parameters
+    + filter (enum, required)
+        + Members
+            + active
+            + inactive
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + type: filter (required, fixed)
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('name', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/users/name',
+        data: {
+          status: 'ok',
+          type: 'order',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('age', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/users/age',
+        data: {
+          status: 'ok',
+          type: 'order',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('active', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/users/active',
+        data: {
+          status: 'ok',
+          type: 'filter',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('inactive', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/users/inactive',
+        data: {
+          status: 'ok',
+          type: 'filter',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('notMember', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/users/notMember',
+        data: {
+          status: 'ok',
+          type: 'order',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
 });

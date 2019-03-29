@@ -42,11 +42,16 @@ module.exports = function generateSchemas(doc) {
             if (transitionAttrs.hrefVariables) {
               transitionAttrs.hrefVariables.content.forEach(variable => {
                 const name = variable.content.key.content;
-                let type = variable.meta ? variable.meta.title : '';
-                if (!(type in typesRegExps)) {
-                  type = 'string';
+                const type = variable.meta ? variable.meta.title : '';
+
+                let regExp = typesRegExps.string;
+                if (type === 'enum') {
+                  const enumValues = variable.content.value.content.map(it => it.content);
+                  regExp = enumValues.join('|');
+                } else if (type in typesRegExps) {
+                  regExp = typesRegExps[type];
                 }
-                variablesRegExps[name] = typesRegExps[type];
+                variablesRegExps[name] = regExp;
 
                 if (variable.attributes.typeAttributes.indexOf('required') >= 0) {
                   requiredVariables.push(name);
