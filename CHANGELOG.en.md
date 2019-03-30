@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 (30.03.2019)
+
+* Add support of enum parameters.
+
 ## 1.6.0 (05.02.2019)
 
 * Add support of query parameters.
