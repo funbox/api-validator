@@ -9,6 +9,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # GET /users
 + Response 200 (application/json)
     + Attributes
@@ -77,6 +79,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # GET /books/{bookId}
 
 + Parameters
@@ -142,6 +146,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # GET /foo
 
 + Response 200 (application/json)
@@ -260,6 +266,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # GET /foo
 
 + Response 200 (application/json)
@@ -360,6 +368,8 @@ describe('validateResponse', () => {
 
   it('handles arrays in parameters', () => {
     const doc = `
+# My API
+
 # Get arrays [GET /arrays/{?foo,bar}]
 + Parameters
     + foo: [1,2] (string, required) - array with two numbers
@@ -385,6 +395,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # Get arrays [GET /foo/{varone}?path=test{&vartwo,varthree}]
 + Parameters
     + varone (number, required)
@@ -437,6 +449,8 @@ describe('validateResponse', () => {
   it('handles parameters without attributes', () => {
     // Проверяем, что корректно обрабатывается параметр hello, у которого в Parameters не указаны атрибуты в скобках.
     const doc = `
+# My API
+
 # GET /foo{?hello}
 + Parameters
     + hello
@@ -461,6 +475,8 @@ describe('validateResponse', () => {
 
     beforeEach(() => {
       const doc = `
+# My API
+
 # GET /users/{order}
 + Parameters
     + order (enum, required)
