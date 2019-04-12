@@ -1,9 +1,9 @@
 import getQueryParams from './get-query-params';
 
-const protagonist = require('@funbox/protagonist');
+const Crafter = require('@funbox/crafter');
 
 module.exports = function generateSchemas(doc) {
-  const ast = protagonist.parseSync(doc);
+  const ast = Crafter.parseSync(doc, {}).toRefract();
   const schemas = [];
   const resources = getResources(ast.content);
 
@@ -17,12 +17,12 @@ module.exports = function generateSchemas(doc) {
         if (Array.isArray(transaction.content)) {
           const request = transaction.content.find((obj) => obj.element === 'httpRequest');
           const response = transaction.content.find((obj) => obj.element === 'httpResponse');
-          const schemaElement = response.content.find((obj) => obj.attributes && obj.attributes.contentType === 'application/schema+json');
+          const schemaElement = response.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
           if (schemaElement) {
-            const method = request.attributes.method;
+            const method = request.attributes.method.content;
             const transitionAttrs = transition.attributes || {};
 
-            const href = transitionAttrs.href || resource.attributes.href;
+            const href = (transitionAttrs.href && transitionAttrs.href.content) || resource.attributes.href.content;
             const hrefWithoutDynamicQueryParams = href.replace(/{[?&][^}]+}/, '');
 
             const [hrefWithoutStaticQueryParams, staticQueryString] = hrefWithoutDynamicQueryParams.split('?');
@@ -42,18 +42,19 @@ module.exports = function generateSchemas(doc) {
             if (transitionAttrs.hrefVariables) {
               transitionAttrs.hrefVariables.content.forEach(variable => {
                 const name = variable.content.key.content;
-                const type = variable.meta ? variable.meta.title : '';
+                const type = variable.meta ? variable.meta.title.content : '';
 
                 let regExp = typesRegExps.string;
                 if (type === 'enum') {
-                  const enumValues = variable.content.value.content.map(it => it.content);
+                  const enumValues = variable.content.value.attributes.enumerations.content.map(it => it.content);
                   regExp = enumValues.join('|');
                 } else if (type in typesRegExps) {
                   regExp = typesRegExps[type];
                 }
                 variablesRegExps[name] = regExp;
 
-                if (variable.attributes.typeAttributes.indexOf('required') >= 0) {
+                const isRequired = !!variable.attributes.typeAttributes.content.find(it => it.content === 'required');
+                if (isRequired) {
                   requiredVariables.push(name);
                 }
               });
@@ -103,9 +104,11 @@ function deleteDescriptions(schema) {
   delete schema.description; // eslint-disable-line no-param-reassign
   switch (schema.type) {
     case 'object': {
-      Object.keys(schema.properties).forEach(key => {
-        deleteDescriptions(schema.properties[key]);
-      });
+      if (schema.properties) {
+        Object.keys(schema.properties).forEach(key => {
+          deleteDescriptions(schema.properties[key]);
+        });
+      }
       if (schema.oneOf) {
         schema.oneOf.forEach(subschema => {
           Object.keys(subschema.properties).forEach(key => {
