@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 (15.04.2019)
+
+* Reject Protagonist in favor of Crafter.
+
 ## 1.7.0 (30.03.2019)
 
 * Add support of enum parameters.
