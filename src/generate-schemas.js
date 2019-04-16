@@ -3,7 +3,7 @@ import getQueryParams from './get-query-params';
 const Crafter = require('@funbox/crafter');
 
 module.exports = function generateSchemas(doc) {
-  const ast = Crafter.parseSync(doc, {}).toRefract();
+  const ast = Crafter.parseFileSync(doc, {}).toRefract();
   const schemas = [];
   const resources = getResources(ast.content);
 

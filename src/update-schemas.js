@@ -53,10 +53,11 @@ function main() {
   console.log(`Клонируем репозиторий документации в ${repoPath}`);
   child_process.execSync(`git clone -b "${branch}" -q --depth 1 "${remote}" ${repoPath}`);
   const doc = child_process.execSync(`git show ${commitId}:"${file}"`, { cwd: repoPath, encoding: 'utf8' });
-  rimraf.sync(repoPath);
 
   console.log(`Парсим ${file}`);
-  const schemas = generateSchemas(doc);
+
+  const schemas = generateSchemas(path.resolve(repoPath, file));
+  rimraf.sync(repoPath);
 
   const schemasPath = path.resolve(basePath, 'schemas.js');
   console.log(`Сохраняем схемы в ${schemasPath}`);
