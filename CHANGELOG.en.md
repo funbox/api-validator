@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (13.05.2019)
+
+* Update Crafter to 1.9.4.
+
 ## 2.0.0 (15.04.2019)
 
 * Reject Protagonist in favor of Crafter.
