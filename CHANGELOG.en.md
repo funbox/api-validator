@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 (04.06.2019)
+
+* Fix parsing of an empty response body in Crafter.
+
 ## 2.1.0 (13.05.2019)
 
 * Update Crafter to 1.9.4.
