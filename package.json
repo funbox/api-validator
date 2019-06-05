@@ -21,6 +21,7 @@
     "@babel/polyfill": "7.0.0",
     "@funbox/crafter": "1.14.4",
     "@funbox/tv4": "1.2.7-fb-2.0.0",
+    "core-js": "2.5.7",
     "rimraf": "2.6.2"
   },
   "devDependencies": {
