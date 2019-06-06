@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.2 (06.06.2019)
+
+* Add core-js to dependencies.
+
 ## 2.1.1 (04.06.2019)
 
 * Fix parsing of an empty response body in Crafter.
