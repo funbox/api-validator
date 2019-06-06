@@ -43,8 +43,9 @@ describe('validateResponse', () => {
         schemas,
       });
       assert.equal(result.status, validationStatus.invalid);
-      assert.equal(result.errors.length, 1);
-      assert.equal(result.errors[0].message, 'Missing required property: result');
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
     });
 
     it('handles unknown response', () => {
@@ -565,6 +566,105 @@ describe('validateResponse', () => {
         schemas,
       });
       assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
+
+  describe('API method with multiple responses', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# GET /example
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + result (string, required)
+
++ Response 200 (application/json)
+    + Attributes
+        + status: internalError (required, fixed)
+
++ Response 200 (application/json)
+    + Attributes(array[string])
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid ok response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'ok',
+          result: 'hello',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles valid internalError response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'internalError',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles valid array response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: ['hello', 'world'],
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid ok response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 3);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
+      assert.equal(result.checkedSchemas[1].errors.length, 1);
+      assert.equal(result.checkedSchemas[1].errors[0].message, 'No enum match for: "ok"');
+      assert.equal(result.checkedSchemas[2].errors.length, 1);
+      assert.equal(result.checkedSchemas[2].errors[0].message, 'Invalid type: object (expected array)');
+    });
+
+    it('handles invalid array response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: [1, false],
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 3);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Invalid type: array (expected object)');
+      assert.equal(result.checkedSchemas[1].errors.length, 1);
+      assert.equal(result.checkedSchemas[1].errors[0].message, 'Invalid type: array (expected object)');
+      assert.equal(result.checkedSchemas[2].errors.length, 2);
+      assert.equal(result.checkedSchemas[2].errors[0].dataPath, '/0');
+      assert.equal(result.checkedSchemas[2].errors[0].message, 'Invalid type: number (expected string)');
+      assert.equal(result.checkedSchemas[2].errors[1].dataPath, '/1');
+      assert.equal(result.checkedSchemas[2].errors[1].message, 'Invalid type: boolean (expected string)');
     });
   });
 });

@@ -15,7 +15,6 @@ export function validateResponse({ method, url, data, schemas, basePath = '' } =
 
   let foundSchemas = schemas.filter(schema => (
     schema.method === method
-    && schema.definition.properties.status.enum.indexOf(data.status) >= 0
     && schema.urlSegments.length === responseUrlSegments.length
   ));
 
@@ -82,12 +81,22 @@ export function validateResponse({ method, url, data, schemas, basePath = '' } =
     return { status: validationStatus.schemaNotFound };
   }
 
-  const result = tv4.validateMultiple(data, foundSchemas[0].definition);
-  if (result.valid) {
-    return { status: validationStatus.valid };
+  const checkedSchemas = [];
+
+  for (let i = 0; i < foundSchemas.length; ++i) {
+    const schema = foundSchemas[i];
+    const result = tv4.validateMultiple(data, schema.definition);
+    if (result.valid) {
+      return { status: validationStatus.valid };
+    }
+    checkedSchemas.push({
+      schema,
+      errors: result.errors,
+    });
   }
+
   return {
     status: validationStatus.invalid,
-    errors: result.errors,
+    checkedSchemas,
   };
 }
