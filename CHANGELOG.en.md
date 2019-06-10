@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.3 (10.06.2019)
+
+* Check any type of response.
+
 ## 2.1.2 (06.06.2019)
 
 * Add core-js to dependencies.
