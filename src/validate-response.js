@@ -7,6 +7,45 @@ export const validationStatus = {
   schemaNotFound: 'schemaNotFound',
 };
 
+export function validateWebsocketResponse({ messageTitle, channel, data, schemas }) {
+  const checkedSchemas = [];
+  const strictCheck = !!messageTitle;
+
+  const foundSchemas = schemas.filter(schema => {
+    const typeMatch = schema.type === 'websocket';
+    const messageTitleMatch = messageTitle ? messageTitle === schema.messageTitle : true;
+    const channelMatch = channel ? channel === schema.channel : true;
+    return typeMatch && messageTitleMatch && channelMatch;
+  });
+
+  if (foundSchemas.length === 0) {
+    return { status: validationStatus.schemaNotFound };
+  }
+
+  for (let i = 0; i < foundSchemas.length; ++i) {
+    const schema = foundSchemas[i];
+    const result = tv4.validateMultiple(data, schema.definition);
+    if (result.valid) {
+      return { status: validationStatus.valid };
+    }
+    checkedSchemas.push({
+      schema,
+      errors: result.errors,
+    });
+  }
+
+  // Если у валидируемого сообщения нет заголовка, а под него не попала ни одна схема,
+  // считаем, что схема не найдена. Иначе, каждая схема будет отмечена как схема с ошибкой
+  if (!strictCheck) {
+    return { status: validationStatus.schemaNotFound };
+  }
+
+  return {
+    status: validationStatus.invalid,
+    checkedSchemas,
+  };
+}
+
 export function validateResponse({ method, url, data, schemas, basePath = '' } = {}) {
   const urlWithoutBasePath = url.slice(basePath.length);
   const [urlWithoutQueryString, queryString] = urlWithoutBasePath.split('?');
@@ -14,7 +53,8 @@ export function validateResponse({ method, url, data, schemas, basePath = '' } =
   const responseQueryParams = getQueryParams(queryString);
 
   let foundSchemas = schemas.filter(schema => (
-    schema.method === method
+    schema.type === 'rest'
+    && schema.method === method
     && schema.urlSegments.length === responseUrlSegments.length
   ));
 
