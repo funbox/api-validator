@@ -18,23 +18,29 @@ module.exports = function generateSchemas(doc, isFilePath) {
 
   subGroups.forEach((subGroup) => {
     const channelTitle = subGroup.meta && subGroup.meta.title.content;
+    let channel = channelTitle;
 
     if (!channelTitle) {
       console.log('Заголовок секции «SubGroup» отсутствует и не может быть использован для валидации канала.');
       process.exit(1);
     }
 
+    const hasVariables = /{([^}]+)}/.test(channelTitle);
+    if (hasVariables) {
+      // Экранирование специальных символов сегмента, за исключением "{" и "}".
+      channel = channel.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
+      // Замена переменных на регулярные выражения.
+      channel = channel.replace(/{([^}]+)}/g, '.+');
+      channel = `^${channel}$`;
+    }
+
     const subgroupMessages = getMessages(subGroup.content);
-    messages.push(...subgroupMessages.map(msg => ({ ...msg, channel: channelTitle })));
+    messages.push(...subgroupMessages.map(msg => ({ ...msg, channel: { isRegExp: hasVariables, value: channel } })));
   });
 
   messages.forEach((message) => {
     const messageTitle = message.meta && message.meta.title.content || null;
     const schemaElement = message.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
-
-    if (!messageTitle) {
-      console.log('Заголовок секции «Message» отсутствует, будет найдена ближайшая подходящая схема.');
-    }
 
     if (schemaElement) {
       const definition = JSON.parse(schemaElement.content);

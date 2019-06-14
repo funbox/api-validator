@@ -14,7 +14,13 @@ export function validateWebsocketResponse({ messageTitle, channel, data, schemas
   const foundSchemas = schemas.filter(schema => {
     const typeMatch = schema.type === 'websocket';
     const messageTitleMatch = messageTitle ? messageTitle === schema.messageTitle : true;
-    const channelMatch = channel ? channel === schema.channel : true;
+    let channelMatch = false;
+    if (schema.channel.isRegExp) {
+      const regExp = new RegExp(schema.channel.value);
+      channelMatch = regExp.test(channel);
+    } else {
+      channelMatch = channel === schema.channel.value;
+    }
     return typeMatch && messageTitleMatch && channelMatch;
   });
 
