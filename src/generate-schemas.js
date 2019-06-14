@@ -5,7 +5,43 @@ const Crafter = require('@funbox/crafter');
 module.exports = function generateSchemas(doc, isFilePath) {
   const ast = Crafter[isFilePath ? 'parseFileSync' : 'parseSync'](doc, {}).toRefract();
   const schemas = [];
+  const subGroups = [];
+  const messages = [];
+  const groups = getGroups(ast.content);
   const resources = getResources(ast.content);
+
+  groups.forEach((group) => {
+    const { messages: groupMessages, subgroups: groupSubgroups } = getSubgroupsAndMessages(group);
+    messages.push(...groupMessages);
+    subGroups.push(...groupSubgroups);
+  });
+
+  subGroups.forEach((subGroup) => {
+    const channelTitle = subGroup.meta && subGroup.meta.title.content;
+
+    if (!channelTitle) {
+      console.log('Заголовок секции «SubGroup» отсутствует и не может быть использован для валидации канала.');
+      process.exit(1);
+    }
+
+    const subgroupMessages = getMessages(subGroup.content);
+    messages.push(...subgroupMessages.map(msg => ({ ...msg, channel: channelTitle })));
+  });
+
+  messages.forEach((message) => {
+    const messageTitle = message.meta && message.meta.title.content || null;
+    const schemaElement = message.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
+
+    if (!messageTitle) {
+      console.log('Заголовок секции «Message» отсутствует, будет найдена ближайшая подходящая схема.');
+    }
+
+    if (schemaElement) {
+      const definition = JSON.parse(schemaElement.content);
+      deleteDescriptions(definition);
+      schemas.push({ type: 'websocket', messageTitle, channel: message.channel || 'none', definition });
+    }
+  });
 
   resources.forEach((resource) => {
     resource.content.forEach((transition) => {
@@ -78,7 +114,7 @@ module.exports = function generateSchemas(doc, isFilePath) {
 
             const definition = JSON.parse(schemaElement.content);
             deleteDescriptions(definition);
-            schemas.push({ method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
+            schemas.push({ type: 'rest', method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
           }
         }
       });
@@ -87,6 +123,25 @@ module.exports = function generateSchemas(doc, isFilePath) {
 
   return schemas;
 };
+
+function getGroups(content) {
+  const groups = [];
+  content.forEach(obj => {
+    if (obj.element === 'category' && getCategoryClassname(obj) === 'resourceGroup') {
+      groups.push(obj);
+    } else if (Array.isArray(obj.content)) {
+      Array.prototype.push.apply(groups, getGroups(obj.content));
+    }
+  });
+  return groups;
+}
+
+function getSubgroupsAndMessages(group) {
+  const messages = getMessages(group.content);
+  const subgroups = getSubgroups(group.content);
+
+  return { messages, subgroups };
+}
 
 function getResources(content) {
   const resources = [];
@@ -98,6 +153,26 @@ function getResources(content) {
     }
   });
   return resources;
+}
+
+function getMessages(content) {
+  const messages = [];
+  content.forEach(obj => {
+    if (obj.element === 'message') {
+      messages.push(obj);
+    }
+  });
+  return messages;
+}
+
+function getSubgroups(content) {
+  const subgroups = [];
+  content.forEach(obj => {
+    if (obj.element === 'category' && getCategoryClassname(obj) === 'subGroup') {
+      subgroups.push(obj);
+    }
+  });
+  return subgroups;
 }
 
 function deleteDescriptions(schema) {
@@ -132,4 +207,12 @@ function deleteDescriptions(schema) {
     }
     // no default
   }
+}
+
+function getCategoryClassname(category) {
+  return (
+    Array.isArray(category.meta.classes)
+      ? category.meta.classes[0]
+      : (category.meta.classes.content && category.meta.classes.content[0].content)
+  );
 }
