@@ -1,4 +1,4 @@
-import { validationStatus, validateResponse } from '../src/validate-response';
+import { validationStatus, validateResponse, validateWebsocketResponse } from '../src/validate-response';
 
 const assert = require('assert');
 const generateSchemas = require('../src/generate-schemas');
@@ -665,6 +665,345 @@ describe('validateResponse', () => {
       assert.equal(result.checkedSchemas[2].errors[0].message, 'Invalid type: number (expected string)');
       assert.equal(result.checkedSchemas[2].errors[1].dataPath, '/1');
       assert.equal(result.checkedSchemas[2].errors[1].message, 'Invalid type: boolean (expected string)');
+    });
+  });
+});
+
+describe('validate WebSocket response', () => {
+  describe('simple message without title', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+### Message
+
++ Attributes
+    + msisdn (string, required)
+    + redirect_url (string, required)
+    
+### Message
+
++ Attributes(string, required)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message with object payload', () => {
+      const result = validateWebsocketResponse({
+        data: {
+          msisdn: '79250002233',
+          redirect_url: 'http://localhost:8080',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles valid message with primitive payload', () => {
+      const result = validateWebsocketResponse({
+        data: 'hello world',
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message', () => {
+      const result = validateWebsocketResponse({
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
+
+  describe('simple message with title', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+### Message authorization_finished
+
++ Attributes
+    + msisdn (string, required)
+    + redirect_url (string, required)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message', () => {
+      const result = validateWebsocketResponse({
+        messageTitle: 'authorization_finished',
+        data: {
+          msisdn: '79250002233',
+          redirect_url: 'http://localhost:8080',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message', () => {
+      const result = validateWebsocketResponse({
+        messageTitle: 'authorization_finished',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: redirect_url');
+    });
+
+    it('handles unknown message', () => {
+      const result = validateWebsocketResponse({
+        messageTitle: 'unknown_message',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
+
+  describe('simple message in subgroup', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+## SubGroup channel-1
+
+### Message await_remote_interaction
+
++ Attributes
+    + msisdn (string, required)
+    + amr (array, required)
+        + USSD_OK (string)
+        + SMS_URL_OK (string)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel-1',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel-1',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: amr');
+    });
+
+    it('handles message with unknown message title', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel-1',
+        messageTitle: 'unknown_message',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+
+    it('handles message with unknown channel', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel-undefined',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
+
+  describe('subgroup with dynamic channel', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+## SubGroup {sessionToken}
+
+### Message await_remote_interaction
+
++ Attributes
+    + msisdn (string, required)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'a6b29b64-8bed-4c29-956c-de2d45438cd9',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+  });
+
+  describe('subgroup with one dynamic segment in channel', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+## SubGroup channel:{channelId}
+
+### Message await_remote_interaction
+
++ Attributes
+    + msisdn (string, required)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:1234',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:1234',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          cliend_id: 'MegaFon',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: msisdn');
+    });
+
+    it('handles message with unknown channel', () => {
+      const result = validateWebsocketResponse({
+        channel: undefined,
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
+
+  describe('subgroup with multiple dynamic segments in channel', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+## SubGroup channel:{channelId}:{userId}
+
+### Message await_remote_interaction
+
++ Attributes
+    + msisdn (string, required)
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:1234:a6b29b64',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:1234:a6b29b64',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          cliend_id: 'MegaFon',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: msisdn');
+    });
+
+    it('handles message with invalid channel', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:1234',
+        messageTitle: 'await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
 });
