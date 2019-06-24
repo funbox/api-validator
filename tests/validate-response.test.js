@@ -1006,4 +1006,48 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
+
+  describe('message with no content', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# Group /adapter/v1
+
+## SubGroup channel:{userId}
+
+### Message cancel_await_remote_interaction
+
+Отменить процесс аутентификации.
+`;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid message (no data)', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:a6b29b64',
+        messageTitle: 'cancel_await_remote_interaction',
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid message (has some data)', () => {
+      const result = validateWebsocketResponse({
+        channel: 'channel:a6b29b64',
+        messageTitle: 'cancel_await_remote_interaction',
+        data: {
+          msisdn: '79250002233',
+          amr: ['USSD_OK'],
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Invalid type: object (expected null)');
+    });
+  });
 });

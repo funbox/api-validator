@@ -7,7 +7,7 @@ export const validationStatus = {
   schemaNotFound: 'schemaNotFound',
 };
 
-export function validateWebsocketResponse({ messageTitle, channel, data, schemas }) {
+export function validateWebsocketResponse({ messageTitle, channel, data = null, schemas }) {
   const checkedSchemas = [];
   const strictCheck = !!messageTitle;
 

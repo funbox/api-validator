@@ -41,12 +41,15 @@ module.exports = function generateSchemas(doc, isFilePath) {
   messages.forEach((message) => {
     const messageTitle = message.meta && message.meta.title.content || null;
     const schemaElement = message.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
+    let definition;
 
     if (schemaElement) {
-      const definition = JSON.parse(schemaElement.content);
+      definition = JSON.parse(schemaElement.content);
       deleteDescriptions(definition);
-      schemas.push({ type: 'websocket', messageTitle, channel: message.channel || 'none', definition });
+    } else {
+      definition = { type: 'null' };
     }
+    schemas.push({ type: 'websocket', messageTitle, channel: message.channel || 'none', definition });
   });
 
   resources.forEach((resource) => {
