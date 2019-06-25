@@ -99,3 +99,42 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
   });
 }]);
 ```
+
+## Проверка ответов сервера для WebSocket-соединения
+
+### В качестве примера используется javascript-клиент фреймворка [Phoenix](https://hexdocs.pm/phoenix/js/)
+
+```javascript
+import schemas from 'api-schemas/schemas';
+import { validateWebsocketResponse, validationStatus } from '@funbox/api-validator/validate-response';
+const { Socket } = require('phoenix');
+
+const socket = new Socket('/adapter/v1', {});
+
+socket.connect();
+
+const channel = socket.channel('channel-topic');
+
+channel.onMessage = (message, payload) => { // https://hexdocs.pm/phoenix/js/#channelonmessage
+  const result = validateWebsocketResponse({
+    messageTitle: message,
+    channel: channel.topic,
+    data: payload,
+    schemas,
+  });
+  switch (result.status) {
+    case validationStatus.valid:
+      console.log(`Схема сообщения ${message} в канале ${channel.topic} найдена и валидна`);
+      return payload;
+    case validationStatus.invalid:
+      console.warn(`Ошибка валидации сообщения ${message} в канале ${channel.topic}`);
+      console.log(result);
+      return payload;
+    case validationStatus.schemaNotFound:
+      console.warn(`Не найдена схема сообщения ${message} в канале ${channel.topic}`);
+      return payload;
+    default:
+      return payload;
+  }
+};
+```
