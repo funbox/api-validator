@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (28.06.2019)
+
+* Add websocket support.
+
 ## 2.1.3 (10.06.2019)
 
 * Check any type of response.
