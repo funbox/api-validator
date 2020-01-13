@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 (13.01.2020)
+
+* Update dependencies.
+
 ## 2.2.0 (28.06.2019)
 
 * Add websocket support.
