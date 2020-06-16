@@ -2,11 +2,12 @@
 
 ## Описание
 
-**api-validator** — это средство для проверки соответствия ответа от сервера документации APIB.
+**api-validator** — это средство для проверки ответа сервера на соответствие
+документации APIB.
 
 ## Извлечение JSON-схем API в проекте
 
-1. Добавить в зависимости проекта `@funbox/api-validator`;
+1. Добавить в зависимости проекта `@funbox/api-validator`.
 2. Добавить в `package.json` проекта поле `doc` вида:
     ```
     "doc": {
@@ -24,9 +25,9 @@
     "update-schemas": "update-schemas"
     ```
 4. Запустить обновление схем командой `npm run update-schemas`.
-5. Команда сохранит в папке проекта файлы:
-- `src/api-schemas/schemas.json` (содержит схемы);
-- `src/api-schemas/doc-version.txt` (содержит ID коммита, использованного при создании схем). 
+   Команда сохранит в папке проекта файлы:
+   - `src/api-schemas/schemas.json` (содержит схемы);
+   - `src/api-schemas/doc-version.txt` (содержит ID коммита, использованного при создании схем).
 
 ## Проверка ответов сервера в React-проектах
 
@@ -102,7 +103,8 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 
 ## Проверка ответов сервера для WebSocket-соединения
 
-### В качестве примера используется javascript-клиент фреймворка [Phoenix](https://hexdocs.pm/phoenix/js/)
+В качестве примера используется JavaScript-клиент фреймворка
+[Phoenix](https://hexdocs.pm/phoenix/js/):
 
 ```javascript
 import schemas from 'api-schemas/schemas';
