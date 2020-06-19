@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.0 (19.06.2020)
+
+* Optimize validation of responses with the "status" field.
+
 ## 2.3.0 (13.01.2020)
 
 * Update dependencies.
