@@ -52,7 +52,7 @@ export function validateWebsocketResponse({ messageTitle, channel, data = null, 
   };
 }
 
-export function validateResponse({ method, url, data, schemas, basePath = '' } = {}) {
+export function validateResponse({ method, url, data, schemas, basePath = '', statusField = '' } = {}) {
   const urlWithoutBasePath = url.slice(basePath.length);
   const [urlWithoutQueryString, queryString] = urlWithoutBasePath.split('?');
   const responseUrlSegments = urlWithoutQueryString.split('/').filter(s => s.length > 0);
@@ -63,6 +63,18 @@ export function validateResponse({ method, url, data, schemas, basePath = '' } =
     && schema.method === method
     && schema.urlSegments.length === responseUrlSegments.length
   ));
+
+  if (statusField) {
+    if (data && data[statusField]) {
+      foundSchemas = foundSchemas.filter(schema => (
+        schema.definition.properties
+        && schema.definition.properties[statusField]
+        && schema.definition.properties[statusField].enum.indexOf(data[statusField]) >= 0
+      ));
+    } else {
+      return { status: validationStatus.schemaNotFound };
+    }
+  }
 
   // Ищем схемы с подходящими URL: проверяем сегменты по очереди, предпочитая совпадения по статическим сегментам.
   // Например, если пришел ответ с URL "/books/user", и у нас есть две подходящие схемы: "/books/{bookId}" и "/books/user",

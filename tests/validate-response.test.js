@@ -667,6 +667,108 @@ describe('validateResponse', () => {
       assert.equal(result.checkedSchemas[2].errors[1].message, 'Invalid type: boolean (expected string)');
     });
   });
+
+  describe('Status field', () => {
+    let schemas;
+
+    beforeEach(() => {
+      const doc = `
+# My API
+
+# GET /example
+
++ Response 200 (application/json)
+    + Attributes
+        + status: ok (required, fixed)
+        + result (string, required)
+
++ Response 200 (application/json)
+    + Attributes
+        + status: internalError (required, fixed)
+      `;
+      schemas = generateSchemas(doc);
+    });
+
+    it('handles valid ok response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'ok',
+          result: 'hello',
+        },
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles valid internalError response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'internalError',
+        },
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid ok response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.invalid);
+      assert.equal(result.checkedSchemas.length, 1);
+      assert.equal(result.checkedSchemas[0].errors.length, 1);
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
+    });
+
+    it('handles response with unknown status', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'unknown',
+        },
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+
+    it('handles response without status field', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          result: 'hello',
+        },
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+
+    it('handles empty response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: '',
+        schemas,
+        statusField: 'status',
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
 });
 
 describe('validate WebSocket response', () => {
