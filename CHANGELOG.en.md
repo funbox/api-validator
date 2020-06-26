@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0 (08.07.2020)
+
+* Update `README.md` text.
+
 ## 2.4.0 (19.06.2020)
 
 * Optimize validation of responses with the "status" field.
