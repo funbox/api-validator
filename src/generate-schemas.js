@@ -2,8 +2,17 @@ import getQueryParams from './get-query-params';
 
 const Crafter = require('@funbox/crafter');
 
+const logger = {
+  warn(text, details) {
+    const [linePos, currentFile] = details;
+    const positionText = linePos ? ` at line ${linePos}` : '';
+    const fileText = currentFile ? ` (see ${currentFile})` : '';
+    console.error('\x1b[33m%s\x1b[0m', `Warning${positionText}${fileText}: ${text}`); // yellow color
+  },
+};
+
 module.exports = function generateSchemas(doc, isFilePath) {
-  const ast = Crafter[isFilePath ? 'parseFileSync' : 'parseSync'](doc, {})[0].toRefract();
+  const ast = Crafter[isFilePath ? 'parseFileSync' : 'parseSync'](doc, { logger })[0].toRefract();
   const schemas = [];
   const subGroups = [];
   const messages = [];
