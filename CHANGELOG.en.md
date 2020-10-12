@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.0 (12.10.2020)
+
+* Add a separate logger to output Crafter warnings.
+
 ## 2.5.0 (08.07.2020)
 
 * Update `README.md` text.
