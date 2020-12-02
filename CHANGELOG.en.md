@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1 (02.12.2020)
+
+* Improve deleteDescriptions function.
+
 ## 2.6.0 (12.10.2020)
 
 * Add a separate logger to output Crafter warnings.
