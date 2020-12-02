@@ -195,40 +195,37 @@ function getSubgroups(content) {
 
 function deleteDescriptions(schema) {
   delete schema.description; // eslint-disable-line no-param-reassign
-  switch (schema.type) {
-    case 'object': {
-      if (schema.properties) {
-        Object.keys(schema.properties).forEach(key => {
-          deleteDescriptions(schema.properties[key]);
-        });
-      }
-      if (schema.oneOf) {
-        schema.oneOf.forEach(subschema => {
-          Object.keys(subschema.properties).forEach(key => {
-            deleteDescriptions(subschema.properties[key]);
-          });
-        });
-      }
-      if (schema.definitions) {
-        Object.keys(schema.definitions).forEach(key => {
-          deleteDescriptions(schema.definitions[key]);
-        });
-      }
-      break;
+
+  const schemaTypeIs = type => schema.type === type || (Array.isArray(schema.type) && schema.type.includes(type));
+
+  if (schemaTypeIs('object')) {
+    if (schema.properties) {
+      Object.keys(schema.properties).forEach(key => {
+        deleteDescriptions(schema.properties[key]);
+      });
     }
-    case 'array': {
-      if (schema.items) {
-        if (Array.isArray(schema.items)) {
-          schema.items.forEach(item => {
-            deleteDescriptions(item);
-          });
-        } else {
-          deleteDescriptions(schema.items);
-        }
-      }
-      break;
+    if (schema.oneOf) {
+      schema.oneOf.forEach(subschema => {
+        Object.keys(subschema.properties).forEach(key => {
+          deleteDescriptions(subschema.properties[key]);
+        });
+      });
     }
-    // no default
+    if (schema.definitions) {
+      Object.keys(schema.definitions).forEach(key => {
+        deleteDescriptions(schema.definitions[key]);
+      });
+    }
+  } else if (schemaTypeIs('array')) {
+    if (schema.items) {
+      if (Array.isArray(schema.items)) {
+        schema.items.forEach(item => {
+          deleteDescriptions(item);
+        });
+      } else {
+        deleteDescriptions(schema.items);
+      }
+    }
   }
 }
 
