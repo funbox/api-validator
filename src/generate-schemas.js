@@ -209,6 +209,11 @@ function deleteDescriptions(schema) {
           });
         });
       }
+      if (schema.definitions) {
+        Object.keys(schema.definitions).forEach(key => {
+          deleteDescriptions(schema.definitions[key]);
+        });
+      }
       break;
     }
     case 'array': {
