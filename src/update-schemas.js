@@ -6,7 +6,7 @@ const child_process = require('child_process');
 const rimraf = require('rimraf');
 const generateSchemas = require('./generate-schemas');
 
-function main() {
+async function main() {
   const packageJsonPath = path.resolve('package.json');
   const packageJsonString = fs.readFileSync(packageJsonPath, { encoding: 'utf8' });
   const packageJson = JSON.parse(packageJsonString);
@@ -55,7 +55,7 @@ function main() {
 
   console.log(`Парсим ${file}`);
 
-  const schemas = generateSchemas(path.resolve(repoPath, file), true);
+  const schemas = await generateSchemas(path.resolve(repoPath, file), true);
   rimraf.sync(repoPath);
 
   const schemasPath = path.resolve(basePath, 'schemas.js');

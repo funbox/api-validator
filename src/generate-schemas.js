@@ -11,8 +11,8 @@ const logger = {
   },
 };
 
-module.exports = function generateSchemas(doc, isFilePath) {
-  const ast = Crafter[isFilePath ? 'parseFileSync' : 'parseSync'](doc, { logger })[0].toRefract();
+module.exports = async function generateSchemas(doc, isFilePath) {
+  const ast = (await Crafter[isFilePath ? 'parseFile' : 'parse'](doc, { logger }))[0].toRefract();
   const schemas = [];
   const subGroups = [];
   const messages = [];
