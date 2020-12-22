@@ -7,7 +7,7 @@ describe('validateResponse', () => {
   describe('simple doc', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -17,7 +17,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + result (string, required)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid response', () => {
@@ -78,7 +78,7 @@ describe('validateResponse', () => {
   describe('dynamic and static url segments', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -99,7 +99,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + userField (number, required)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('validates /books/user', () => {
@@ -145,7 +145,7 @@ describe('validateResponse', () => {
   describe('dynamic and static query params', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -180,7 +180,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + withTwoStaticParams (string, required)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('without param', () => {
@@ -265,7 +265,7 @@ describe('validateResponse', () => {
   describe('should select schema that has the biggest number of matched required dynamic query parameters', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -298,7 +298,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + twoRequiredDynamicParams (string, required)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('zero required dynamic params', () => {
@@ -367,7 +367,7 @@ describe('validateResponse', () => {
     });
   });
 
-  it('handles arrays in parameters', () => {
+  it('handles arrays in parameters', async () => {
     const doc = `
 # My API
 
@@ -379,7 +379,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-    const schemas = generateSchemas(doc);
+    const schemas = await generateSchemas(doc);
     const result = validateResponse({
       method: 'GET',
       url: '/arrays?foo[]=1&foo[]=2&bar[0]=3&bar[1]=4',
@@ -394,7 +394,7 @@ describe('validateResponse', () => {
   describe('ampersand in query parameters', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -407,7 +407,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('valid', () => {
@@ -447,7 +447,7 @@ describe('validateResponse', () => {
     });
   });
 
-  it('handles parameters without attributes', () => {
+  it('handles parameters without attributes', async () => {
     // Проверяем, что корректно обрабатывается параметр hello, у которого в Parameters не указаны атрибуты в скобках.
     const doc = `
 # My API
@@ -459,7 +459,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-    const schemas = generateSchemas(doc);
+    const schemas = await generateSchemas(doc);
     const result = validateResponse({
       method: 'GET',
       url: '/foo?hello=world',
@@ -474,7 +474,7 @@ describe('validateResponse', () => {
   describe('enums in parameters', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -500,7 +500,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + type: filter (required, fixed)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('name', () => {
@@ -572,7 +572,7 @@ describe('validateResponse', () => {
   describe('API method with multiple responses', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -590,7 +590,7 @@ describe('validateResponse', () => {
 + Response 200 (application/json)
     + Attributes(array[string])
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid ok response', () => {
@@ -671,7 +671,7 @@ describe('validateResponse', () => {
   describe('Status field', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -686,7 +686,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: internalError (required, fixed)
       `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid ok response', () => {
@@ -775,7 +775,7 @@ describe('validate WebSocket response', () => {
   describe('simple message without title', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -791,7 +791,7 @@ describe('validate WebSocket response', () => {
 
 + Attributes(string, required)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message with object payload', () => {
@@ -827,7 +827,7 @@ describe('validate WebSocket response', () => {
   describe('simple message with title', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -839,7 +839,7 @@ describe('validate WebSocket response', () => {
     + msisdn (string, required)
     + redirect_url (string, required)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message', () => {
@@ -883,7 +883,7 @@ describe('validate WebSocket response', () => {
   describe('simple message in subgroup', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -899,7 +899,7 @@ describe('validate WebSocket response', () => {
         + USSD_OK (string)
         + SMS_URL_OK (string)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message', () => {
@@ -960,7 +960,7 @@ describe('validate WebSocket response', () => {
   describe('subgroup with dynamic channel', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -973,7 +973,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message', () => {
@@ -992,7 +992,7 @@ describe('validate WebSocket response', () => {
   describe('subgroup with one dynamic segment in channel', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -1005,7 +1005,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message', () => {
@@ -1052,7 +1052,7 @@ describe('validate WebSocket response', () => {
   describe('subgroup with multiple dynamic segments in channel', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -1065,7 +1065,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message', () => {
@@ -1112,7 +1112,7 @@ describe('validate WebSocket response', () => {
   describe('message with no content', () => {
     let schemas;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const doc = `
 # My API
 
@@ -1124,7 +1124,7 @@ describe('validate WebSocket response', () => {
 
 Отменить процесс аутентификации.
 `;
-      schemas = generateSchemas(doc);
+      schemas = await generateSchemas(doc);
     });
 
     it('handles valid message (no data)', () => {
