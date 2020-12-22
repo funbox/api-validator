@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.2 (22.12.2020)
+
+* Fix combination of ref and nullable in JSON schemas.
+
 ## 2.6.1 (02.12.2020)
 
 * Improve deleteDescriptions function.
