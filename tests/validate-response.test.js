@@ -769,6 +769,40 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
+
+  it('accepts null value for nullable referenced attribute', async () => {
+    const doc = `
+# My API
+
+# Data Structures
+
+## Data
++ a
++ b
+
+# DataWrapper
+
++ data (Data, nullable, required)
+
+# GET /foo
+
++ Response 200 (application/json)
+  + Attributes
+    + items (array[DataWrapper], required)
+`;
+    const schemas = await generateSchemas(doc);
+    const result = validateResponse({
+      method: 'GET',
+      url: '/foo',
+      data: {
+        items: [
+          { data: null },
+        ],
+      },
+      schemas,
+    });
+    assert.equal(result.status, validationStatus.valid);
+  });
 });
 
 describe('validate WebSocket response', () => {
