@@ -12,12 +12,18 @@ const logger = {
 };
 
 module.exports = async function generateSchemas(doc, isFilePath) {
-  const ast = (await Crafter[isFilePath ? 'parseFile' : 'parse'](doc, { logger }))[0].toRefract();
+  const [parseResult] = await Crafter[isFilePath ? 'parseFile' : 'parse'](doc, { logger });
+  const ast = parseResult.toRefract();
   const schemas = [];
   const subGroups = [];
   const messages = [];
   const groups = getGroups(ast.content);
   const resources = getResources(ast.content);
+  const [hasError, errorDetails] = astHasError(parseResult);
+
+  if (hasError) {
+    return { schemas, error: errorDetails };
+  }
 
   groups.forEach((group) => {
     const { messages: groupMessages, subgroups: groupSubgroups } = getSubgroupsAndMessages(group);
@@ -139,7 +145,7 @@ module.exports = async function generateSchemas(doc, isFilePath) {
     });
   });
 
-  return schemas;
+  return { schemas, error: null };
 };
 
 function getGroups(content) {
@@ -235,4 +241,21 @@ function getCategoryClassname(category) {
       ? category.meta.classes[0]
       : (category.meta.classes.content && category.meta.classes.content[0].content)
   );
+}
+
+function astHasError(parseResult) {
+  const errorAnnotationIndex = parseResult.annotations.findIndex(anno => anno.type === 'error');
+  if (errorAnnotationIndex > -1) {
+    const anno = parseResult.annotations[errorAnnotationIndex];
+    const { text } = anno;
+
+    if (!anno.sourceMap) {
+      return [true, { text }];
+    }
+
+    const position = anno.sourceMap.charBlocks[0];
+    const file = anno.sourceMap.file;
+    return [true, { text, position, file }];
+  }
+  return [false];
 }
