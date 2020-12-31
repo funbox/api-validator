@@ -5,6 +5,7 @@ const path = require('path');
 const child_process = require('child_process');
 const rimraf = require('rimraf');
 const generateSchemas = require('./generate-schemas');
+const { logCrafterError } = require('./utils');
 
 async function main() {
   const packageJsonPath = path.resolve('package.json');
@@ -27,12 +28,14 @@ async function main() {
   const file = (config.file && typeof config.file === 'string') ? sanitizeParam(config.file) : 'doc.apib';
 
   const basePath = path.resolve('src/api-schemas');
+  let basePathCreated = false;
   if (!fs.existsSync(basePath)) {
     const srcPath = path.resolve('src');
     if (!fs.existsSync(srcPath)) {
       fs.mkdirSync(srcPath);
     }
     fs.mkdirSync(basePath);
+    basePathCreated = true;
   }
 
   const repoPath = path.resolve(basePath, 'doc_repo');
@@ -55,7 +58,19 @@ async function main() {
 
   console.log(`Парсим ${file}`);
 
-  const schemas = await generateSchemas(path.resolve(repoPath, file), true);
+  const filePath = path.resolve(repoPath, file);
+  const { schemas, error } = await generateSchemas(filePath, true);
+
+  if (error) {
+    console.log(`Ошибка парсинга ${file}, откатываем изменения.`);
+    logCrafterError(filePath, error).then(() => {
+      if (basePathCreated) {
+        rimraf.sync(basePath);
+      }
+      rimraf.sync(repoPath);
+    });
+    return;
+  }
   rimraf.sync(repoPath);
 
   const schemasPath = path.resolve(basePath, 'schemas.js');
