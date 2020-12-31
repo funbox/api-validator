@@ -17,7 +17,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + result (string, required)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid response', () => {
@@ -99,7 +99,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + userField (number, required)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('validates /books/user', () => {
@@ -180,7 +180,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + withTwoStaticParams (string, required)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('without param', () => {
@@ -298,7 +298,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + twoRequiredDynamicParams (string, required)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('zero required dynamic params', () => {
@@ -379,7 +379,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-    const schemas = await generateSchemas(doc);
+    const { schemas } = await generateSchemas(doc);
     const result = validateResponse({
       method: 'GET',
       url: '/arrays?foo[]=1&foo[]=2&bar[0]=3&bar[1]=4',
@@ -407,7 +407,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('valid', () => {
@@ -459,7 +459,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: ok (required, fixed)
       `;
-    const schemas = await generateSchemas(doc);
+    const { schemas } = await generateSchemas(doc);
     const result = validateResponse({
       method: 'GET',
       url: '/foo?hello=world',
@@ -500,7 +500,7 @@ describe('validateResponse', () => {
         + status: ok (required, fixed)
         + type: filter (required, fixed)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('name', () => {
@@ -590,7 +590,7 @@ describe('validateResponse', () => {
 + Response 200 (application/json)
     + Attributes(array[string])
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid ok response', () => {
@@ -686,7 +686,7 @@ describe('validateResponse', () => {
     + Attributes
         + status: internalError (required, fixed)
       `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid ok response', () => {
@@ -790,7 +790,7 @@ describe('validateResponse', () => {
   + Attributes
     + items (array[DataWrapper], required)
 `;
-    const schemas = await generateSchemas(doc);
+    const { schemas } = await generateSchemas(doc);
     const result = validateResponse({
       method: 'GET',
       url: '/foo',
@@ -820,12 +820,12 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
     + redirect_url (string, required)
-    
+
 ### Message
 
 + Attributes(string, required)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message with object payload', () => {
@@ -873,7 +873,7 @@ describe('validate WebSocket response', () => {
     + msisdn (string, required)
     + redirect_url (string, required)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message', () => {
@@ -933,7 +933,7 @@ describe('validate WebSocket response', () => {
         + USSD_OK (string)
         + SMS_URL_OK (string)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message', () => {
@@ -1007,7 +1007,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message', () => {
@@ -1039,7 +1039,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message', () => {
@@ -1099,7 +1099,7 @@ describe('validate WebSocket response', () => {
 + Attributes
     + msisdn (string, required)
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message', () => {
@@ -1158,7 +1158,7 @@ describe('validate WebSocket response', () => {
 
 Отменить процесс аутентификации.
 `;
-      schemas = await generateSchemas(doc);
+      schemas = (await generateSchemas(doc)).schemas;
     });
 
     it('handles valid message (no data)', () => {
