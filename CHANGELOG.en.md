@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0 (01.01.2021)
+
+* Log parsing errors from Crafter.
+
 ## 2.6.2 (22.12.2020)
 
 * Fix combination of ref and nullable in JSON schemas.
