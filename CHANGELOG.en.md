@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.0 (15.03.2021)
+
+* Add core-js and regenerator-runtime to peerDependencies.
+
 ## 2.8.0 (15.03.2021)
 
 * Fix vulnerabilities after npm audit.
