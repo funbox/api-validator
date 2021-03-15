@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.0 (15.03.2021)
+
+* Fix vulnerabilities after npm audit.
+
 ## 2.7.0 (01.01.2021)
 
 * Log parsing errors from Crafter.
