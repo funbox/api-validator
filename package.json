@@ -31,5 +31,9 @@
     "core-js": "3.6.3",
     "eslint": "6.8.0",
     "mocha": "8.3.2"
+  },
+  "peerDependencies": {
+    "core-js": "^3.6.3",
+    "regenerator-runtime": "^0.13.7"
   }
 }
