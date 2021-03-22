@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.1 (22.03.2021)
+
+* Disable pipeline for tags.
+
 ## 2.9.0 (15.03.2021)
 
 * Add core-js and regenerator-runtime to peerDependencies.

@@ -1,5 +1,9 @@
 # История изменений проекта
 
+## 2.9.1 (22.03.2021)
+
+* Отключение tags pipeline.
+
 ## 2.9.0 (15.03.2021)
 
 * Добавление core-js и regenerator-runtime в peerDependencies.
