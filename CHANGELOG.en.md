@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.3 (24.03.2021)
+
+* Setup package auto-publication.
+
 ## 2.9.2 (23.03.2021)
 
 * Setup node_modules caching.
