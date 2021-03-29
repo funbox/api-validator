@@ -35,7 +35,7 @@
 import axios from 'axios';
 import settings from 'app/app.settings';
 import schemas from 'api-schemas/schemas';
-import { validateResponse, validationStatus } from '@funbox/api-validator/validate-response';
+import { validateResponse, validationStatus } from '@funbox/api-validator';
 
 axios.interceptors.response.use(response => {
   const result = validateResponse({
@@ -67,7 +67,7 @@ axios.interceptors.response.use(response => {
 
 ```javascript
 import schemas from 'api-schemas/schemas';
-import { validateResponse, validationStatus } from '@funbox/api-validator/validate-response';
+import { validateResponse, validationStatus } from '@funbox/api-validator';
 
 angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, settings) => {
   restfulProvider.addInterceptor({
@@ -108,7 +108,7 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 
 ```javascript
 import schemas from 'api-schemas/schemas';
-import { validateWebsocketResponse, validationStatus } from '@funbox/api-validator/validate-response';
+import { validateWebsocketResponse, validationStatus } from '@funbox/api-validator';
 const { Socket } = require('phoenix');
 
 const socket = new Socket('/adapter/v1', {});
