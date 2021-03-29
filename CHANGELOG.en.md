@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10.0 (29.03.2021)
+
+* Export validateWebsocketResponse function from the index file.
+
 ## 2.9.3 (24.03.2021)
 
 * Setup package auto-publication.
