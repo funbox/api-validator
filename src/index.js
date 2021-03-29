@@ -1,1 +1,1 @@
-export { validationStatus, validateResponse } from './validate-response';
+export { validationStatus, validateResponse, validateWebsocketResponse } from './validate-response';
