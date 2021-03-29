@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10.1 (29.03.2021)
+
+* Delete`no_proxy` variable.
+
 ## 2.10.0 (29.03.2021)
 
 * Export validateWebsocketResponse function from the index file.
