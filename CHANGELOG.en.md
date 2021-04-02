@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.0 (02.04.2021)
+
+* Update gitlab-ci config.
+
 ## 2.10.1 (29.03.2021)
 
 * Delete`no_proxy` variable.
