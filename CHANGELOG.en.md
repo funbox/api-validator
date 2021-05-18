@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.12.0 (18.05.2021)
+
+* Create a new release after merge to the master branch.
+
 ## 2.11.0 (02.04.2021)
 
 * Update gitlab-ci config.
