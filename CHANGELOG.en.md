@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 (24.06.2021)
+
+* Use crafter v3.
+
 ## 2.12.0 (18.05.2021)
 
 * Create a new release after merge to the master branch.
