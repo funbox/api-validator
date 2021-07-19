@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 (19.07.2021)
+
+* Fix parsing of URL parameters that contain symbols "~", ".", "-".
+
 ## 3.0.0 (24.06.2021)
 
 * Use crafter v3.
