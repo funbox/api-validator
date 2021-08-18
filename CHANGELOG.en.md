@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 (18.08.2021)
+
+* Notify about new releases.
+
 ## 3.0.1 (19.07.2021)
 
 * Fix parsing of URL parameters that contain symbols "~", ".", "-".
