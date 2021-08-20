@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0 (20.08.2021)
+
+* Change formatting of release notifications.
+
 ## 3.1.0 (18.08.2021)
 
 * Notify about new releases.
