@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1 (17.09.2021)
+
+* Update repository link.
+
 ## 3.2.0 (20.08.2021)
 
 * Change formatting of release notifications.
