@@ -37,7 +37,7 @@ function deleteDescriptions(schema) {
     }
     if (schema.oneOf) {
       schema.oneOf.forEach(subschema => {
-        Object.keys(subschema.properties).forEach(key => {
+        Object.keys(subschema.properties || {}).forEach(key => {
           deleteDescriptions(subschema.properties[key]);
         });
       });
