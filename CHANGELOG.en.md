@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.2 (08.11.2021)
+
+* Fix error caused by parsing of a nullable One Of.
+
 ## 3.2.1 (17.09.2021)
 
 * Update repository link.

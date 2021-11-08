@@ -1,6 +1,6 @@
 {
   "name": "@funbox/api-validator",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Средство проверки соответствия ответа от сервера документации apib",
   "main": "dist/index.js",
   "bin": {
