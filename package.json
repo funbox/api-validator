@@ -7,7 +7,7 @@
     "update-schemas": "./dist/update-schemas.js"
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "lawyer && npm run build",
     "build": "./node_modules/.bin/babel src --out-dir dist",
     "test": "mocha --require @babel/register tests/*.test.js",
     "lint": "eslint --cache -c .eslintrc --ext .js ./src ./tests"
