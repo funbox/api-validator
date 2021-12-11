@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.0 (11.12.2021)
+
+* Add Lawyer.
+
 ## 3.2.2 (08.11.2021)
 
 * Fix error caused by parsing of a nullable One Of.
