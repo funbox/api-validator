@@ -1,4 +1,4 @@
-import tv4 from '@funbox/tv4';
+import jsonschema from 'jsonschema';
 import getQueryParams from './get-query-params';
 
 export const validationStatus = {
@@ -6,6 +6,10 @@ export const validationStatus = {
   invalid: 'invalid',
   schemaNotFound: 'schemaNotFound',
 };
+
+function validate(data, schema) {
+  return jsonschema.validate(data, schema, { nestedErrors: true });
+}
 
 export function validateWebsocketResponse({ messageTitle, channel, data = null, schemas }) {
   const checkedSchemas = [];
@@ -30,7 +34,7 @@ export function validateWebsocketResponse({ messageTitle, channel, data = null, 
 
   for (let i = 0; i < foundSchemas.length; ++i) {
     const schema = foundSchemas[i];
-    const result = tv4.validateMultiple(data, schema.definition);
+    const result = validate(data, schema.definition);
     if (result.valid) {
       return { status: validationStatus.valid };
     }
@@ -143,7 +147,7 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
 
   for (let i = 0; i < foundSchemas.length; ++i) {
     const schema = foundSchemas[i];
-    const result = tv4.validateMultiple(data, schema.definition);
+    const result = validate(data, schema.definition);
     if (result.valid) {
       return { status: validationStatus.valid };
     }

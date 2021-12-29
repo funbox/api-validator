@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@funbox/crafter": "3.4.2",
-    "@funbox/tv4": "1.2.7-fb-2.0.0",
+    "jsonschema": "1.4.0",
     "rimraf": "3.0.0"
   },
   "devDependencies": {
