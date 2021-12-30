@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0 (30.12.2021)
+
+* Change tool for JSON schema validation.
+
 ## 3.3.0 (11.12.2021)
 
 * Add Lawyer.
