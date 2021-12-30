@@ -45,7 +45,8 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "result"');
     });
 
     it('handles unknown response', () => {
@@ -640,11 +641,14 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 3);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "result"');
       assert.equal(result.checkedSchemas[1].errors.length, 1);
-      assert.equal(result.checkedSchemas[1].errors[0].message, 'No enum match for: "ok"');
+      assert.equal(result.checkedSchemas[1].errors[0].property, 'instance.status');
+      assert.equal(result.checkedSchemas[1].errors[0].message, 'is not one of enum values: internalError');
       assert.equal(result.checkedSchemas[2].errors.length, 1);
-      assert.equal(result.checkedSchemas[2].errors[0].message, 'Invalid type: object (expected array)');
+      assert.equal(result.checkedSchemas[2].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[2].errors[0].message, 'is not of a type(s) array');
     });
 
     it('handles invalid array response', () => {
@@ -657,14 +661,18 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 3);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Invalid type: array (expected object)');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'is not of a type(s) object');
       assert.equal(result.checkedSchemas[1].errors.length, 1);
-      assert.equal(result.checkedSchemas[1].errors[0].message, 'Invalid type: array (expected object)');
+      assert.equal(result.checkedSchemas[1].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[1].errors[0].message, 'is not of a type(s) object');
       assert.equal(result.checkedSchemas[2].errors.length, 2);
-      assert.equal(result.checkedSchemas[2].errors[0].dataPath, '/0');
-      assert.equal(result.checkedSchemas[2].errors[0].message, 'Invalid type: number (expected string)');
-      assert.equal(result.checkedSchemas[2].errors[1].dataPath, '/1');
-      assert.equal(result.checkedSchemas[2].errors[1].message, 'Invalid type: boolean (expected string)');
+      assert.equal(result.checkedSchemas[2].errors[0].property, 'instance[0]');
+      assert.equal(result.checkedSchemas[2].errors[0].path[0], 0);
+      assert.equal(result.checkedSchemas[2].errors[0].message, 'is not of a type(s) string');
+      assert.equal(result.checkedSchemas[2].errors[1].property, 'instance[1]');
+      assert.equal(result.checkedSchemas[2].errors[1].path[0], 1);
+      assert.equal(result.checkedSchemas[2].errors[1].message, 'is not of a type(s) string');
     });
   });
 
@@ -729,7 +737,8 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: result');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "result"');
     });
 
     it('handles response with unknown status', () => {
@@ -899,7 +908,8 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: redirect_url');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "redirect_url"');
     });
 
     it('handles unknown message', () => {
@@ -961,7 +971,8 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: amr');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "amr"');
     });
 
     it('handles message with unknown message title', () => {
@@ -1066,7 +1077,8 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: msisdn');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "msisdn"');
     });
 
     it('handles message with unknown channel', () => {
@@ -1126,7 +1138,8 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Missing required property: msisdn');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'requires property "msisdn"');
     });
 
     it('handles message with invalid channel', () => {
@@ -1183,7 +1196,8 @@ describe('validate WebSocket response', () => {
       assert.equal(result.status, validationStatus.invalid);
       assert.equal(result.checkedSchemas.length, 1);
       assert.equal(result.checkedSchemas[0].errors.length, 1);
-      assert.equal(result.checkedSchemas[0].errors[0].message, 'Invalid type: object (expected null)');
+      assert.equal(result.checkedSchemas[0].errors[0].property, 'instance');
+      assert.equal(result.checkedSchemas[0].errors[0].message, 'is not of a type(s) null');
     });
   });
 });
