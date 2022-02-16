@@ -1,4 +1,4 @@
-# @funbox/api-validator
+# @funboxteam/api-validator
 
 ## Описание
 
@@ -7,7 +7,7 @@
 
 ## Извлечение JSON-схем API в проекте
 
-1. Добавить в зависимости проекта `@funbox/api-validator`.
+1. Добавить в зависимости проекта `@funboxteam/api-validator`.
 2. Добавить в `package.json` проекта поле `doc` вида:
     ```
     "doc": {
@@ -35,7 +35,7 @@
 import axios from 'axios';
 import settings from 'app/app.settings';
 import schemas from 'api-schemas/schemas';
-import { validateResponse, validationStatus } from '@funbox/api-validator';
+import { validateResponse, validationStatus } from '@funboxteam/api-validator';
 
 axios.interceptors.response.use(response => {
   const result = validateResponse({
@@ -67,7 +67,7 @@ axios.interceptors.response.use(response => {
 
 ```javascript
 import schemas from 'api-schemas/schemas';
-import { validateResponse, validationStatus } from '@funbox/api-validator';
+import { validateResponse, validationStatus } from '@funboxteam/api-validator';
 
 angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, settings) => {
   restfulProvider.addInterceptor({
@@ -108,7 +108,7 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 
 ```javascript
 import schemas from 'api-schemas/schemas';
-import { validateWebsocketResponse, validationStatus } from '@funbox/api-validator';
+import { validateWebsocketResponse, validationStatus } from '@funboxteam/api-validator';
 const { Socket } = require('phoenix');
 
 const socket = new Socket('/adapter/v1', {});
