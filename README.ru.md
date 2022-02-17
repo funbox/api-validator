@@ -1,35 +1,76 @@
 # @funboxteam/api-validator
 
-## Описание
+**api-validator** — это средство для проверки ответа сервера на соответствие документации API Blueprint.
 
-**api-validator** — это средство для проверки ответа сервера на соответствие
-документации APIB.
+## Мотивация
 
-## Извлечение JSON-схем API в проекте
+Наличие человекочитаемой документации API — это хороший способ задать контракт между клиентской и серверной частями приложения.
+Однако современные веб-приложения настолько сложны, что серверный ответ может легко содержать десятки полей и в каждое поле будут
+вложены другие поля. Поэтому вполне возможна ситуация, когда бэкенд присылает ответ не по документации из-за бага или других причин.
 
-1. Добавить в зависимости проекта `@funboxteam/api-validator`.
-2. Добавить в `package.json` проекта поле `doc` вида:
-    ```
-    "doc": {
-      "repo": "git@github.com:your-username/your-apib-repository.git",
-      "branch": "master",
-      "file": "doc.apib"
-    }
-    ```
-    где:
-    - `repo` — адрес репозитория (обязательное поле);
-    - `branch` — название ветки (обязательное поле);
-    - `file` — название файла внутри репозитория (необязательное поле, по умолчанию `doc.apib`).
-3. Добавить в `scripts` в `package.json` проекта команду:
-    ```
-    "update-schemas": "update-schemas"
-    ```
-4. Запустить обновление схем командой `npm run update-schemas`.
-   Команда сохранит в папке проекта файлы:
-   - `src/api-schemas/schemas.json` (содержит схемы);
-   - `src/api-schemas/doc-version.txt` (содержит ID коммита, использованного при создании схем).
+Чтобы минимизировать количество ошибок в работе фронтэнда, связанное с некорректными ответами бекэнда, мы разработали инструмент
+для валидации. Он выгружает JSON схемы из документации в формате API Blueprint и позволяет автоматически проверить соответствие
+ответа бекэнда и документации на указанный запрос.
 
-## Проверка ответов сервера в React-проектах
+## Установка
+
+```bash
+npm install --save @funboxteam/api-blueprint
+```
+
+## Использование
+
+### Извлечение JSON-схем API в проекте
+
+Добавить в `package.json` проекта поле `doc` вида:
+  ```json
+  "doc": {
+    "repo": "git@github.com:your-username/your-apib-repository.git",
+    "branch": "master",
+    "file": "doc.apib"
+  }
+  ```
+где:
+  - `repo` — адрес репозитория (обязательное поле);
+  - `branch` — название ветки (обязательное поле);
+  - `file` — название файла внутри репозитория (необязательное поле, по умолчанию `doc.apib`).
+
+Пакет предоставляет бинарный файл `update-schemas`, поэтому можно сгенерировать новые схемы или обновить существующие,
+выполнив команду `update-schemas` в терминале.
+
+Команда сохранит в папке проекта файлы:
+   - `src/api-schemas/schemas.json` — содержит схемы;
+   - `src/api-schemas/doc-version.txt` — содержит ID коммита, использованного при создании схем.
+
+### Валидация ответа от сервера
+
+Импортировать извлеченные схемы, добавленные в проект, и функцию валидации из утилиты:
+
+```javascript
+import { validateResponse } from '@funboxteam/api-validator';
+import schemas from 'src/api-schemas/schemas';
+```
+
+Для получения результатов валидации вызвать функцию, в которую передать данные ответа и набор JSON схем:
+
+```javascript
+const responseInfo = {
+  method: 'GET',
+  url: '/api/auth',
+  data: { status: 'ok' }
+};
+
+const validationResult = validateResponse({
+  method: responseInfo.method,
+  url: responseInfo.url,
+  data: responseInfo.data,
+  schemas,
+});
+```
+
+## Примеры
+
+### Проверка ответов сервера в React-проектах
 
 ```javascript
 import axios from 'axios';
@@ -63,7 +104,7 @@ axios.interceptors.response.use(response => {
 });
 ```
 
-## Проверка ответов сервера в Angular-проектах
+### Проверка ответов сервера в Angular-проектах
 
 ```javascript
 import schemas from 'api-schemas/schemas';
@@ -101,7 +142,7 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 }]);
 ```
 
-## Проверка ответов сервера для WebSocket-соединения
+### Проверка ответов сервера для WebSocket-соединения
 
 В качестве примера используется JavaScript-клиент фреймворка
 [Phoenix](https://hexdocs.pm/phoenix/js/):
@@ -140,3 +181,5 @@ channel.onMessage = (message, payload) => { // https://hexdocs.pm/phoenix/js/#ch
   }
 };
 ```
+
+[![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)
