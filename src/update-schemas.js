@@ -14,12 +14,12 @@ async function main() {
   const config = packageJson.doc || {};
 
   if (!config.repo || typeof config.repo !== 'string') {
-    console.log('В поле "doc.repo" в package.json должна быть строка с адресом репозитория документации.');
+    console.log('The "doc.repo" field in package.json should contain the URL of the documentation repository.');
     process.exit(1);
   }
 
   if (!config.branch || typeof config.branch !== 'string') {
-    console.log('В поле "doc.branch" в package.json должна быть строка с названием ветки.');
+    console.log('The "doc.repo" field in package.json should contain the branch name.');
     process.exit(1);
   }
 
@@ -40,29 +40,29 @@ async function main() {
 
   const repoPath = path.resolve(basePath, 'doc_repo');
   if (fs.existsSync(repoPath)) {
-    console.log(`Путь ${repoPath} уже занят! Удалите существующий файл/папку и попробуйте снова.`);
+    console.log(`Path ${repoPath} already exists! Delete existing file/folder and try again.`);
     process.exit(1);
   }
 
-  console.log(`Получаем ID коммита из ${remote}, ветка ${branch}`);
+  console.log(`Extracting commit ID from ${remote}, ${branch} branch`);
   const commitIdResult = child_process.execSync(`git ls-remote "${remote}" "${branch}"`, { encoding: 'utf8' });
   const commitIdMatch = commitIdResult.match(/^\S+/);
   if (!commitIdMatch) {
-    console.log(`В репозитории ${remote} не найдена ветка ${branch}`);
+    console.log(`Branch ${branch} not found in the repository ${remote}`);
     process.exit(1);
   }
   const commitId = commitIdMatch[0];
 
-  console.log(`Клонируем репозиторий документации в ${repoPath}`);
+  console.log(`Cloning the documentation repository into ${repoPath}`);
   child_process.execSync(`git clone -b "${branch}" -q --depth 1 "${remote}" ${repoPath}`);
 
-  console.log(`Парсим ${file}`);
+  console.log(`Parsing of ${file}`);
 
   const filePath = path.resolve(repoPath, file);
   const { schemas, error } = await generateSchemas(filePath, true);
 
   if (error) {
-    console.log(`Ошибка парсинга ${file}, откатываем изменения.`);
+    console.log(`Parsing error for ${file}, rollback changes.`);
     logCrafterError(filePath, error).then(() => {
       if (basePathCreated) {
         rimraf.sync(basePath);
@@ -74,11 +74,11 @@ async function main() {
   rimraf.sync(repoPath);
 
   const schemasPath = path.resolve(basePath, 'schemas.js');
-  console.log(`Сохраняем схемы в ${schemasPath}`);
+  console.log(`Save schemas into ${schemasPath}`);
   fs.writeFileSync(schemasPath, `export default ${JSON.stringify(schemas, null, 2)};\n`);
 
   const versionPath = path.resolve(basePath, 'doc-version.txt');
-  console.log(`Сохраняем ID коммита в ${versionPath}`);
+  console.log(`Save the commit ID into ${versionPath}`);
   fs.writeFileSync(versionPath, commitId);
 }
 
