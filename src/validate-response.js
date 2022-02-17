@@ -44,8 +44,8 @@ export function validateWebsocketResponse({ messageTitle, channel, data = null, 
     });
   }
 
-  // Если у валидируемого сообщения нет заголовка, а под него не попала ни одна схема,
-  // считаем, что схема не найдена. Иначе, каждая схема будет отмечена как схема с ошибкой
+  // If a message to validate lacks a title and no corresponding schema is found,
+  // consider no schema found at all. Otherwise, every schema will be marked as erroneous.
   if (!strictCheck) {
     return { status: validationStatus.schemaNotFound };
   }
@@ -80,9 +80,9 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
     }
   }
 
-  // Ищем схемы с подходящими URL: проверяем сегменты по очереди, предпочитая совпадения по статическим сегментам.
-  // Например, если пришел ответ с URL "/books/user", и у нас есть две подходящие схемы: "/books/{bookId}" и "/books/user",
-  // будет выбрана схема "/books/user".
+  // Look for a schema with matching URL: check segments one by one, preferring matches on static segments.
+  // E.g. if we have a response with the URL "/books/user" and two schemas are matching ("/books/{bookId}" and "/books/user"),
+  // schema "/books/user" will be selected.
   responseUrlSegments.forEach((responseSegment, segIdx) => {
     let matchingSchemas = [];
     let atLeastOneStaticMatch = false;
@@ -103,7 +103,7 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
       }
     });
     if (atLeastOneStaticMatch) {
-      // Оставляем только схемы со статическими сегментами.
+      // Leave only schemas with static segments
       matchingSchemas = matchingSchemas.filter(schema => !schema.urlSegments[segIdx].isRegExp);
     }
     foundSchemas = matchingSchemas;
@@ -111,7 +111,7 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
 
   let maxMatchedStaticQueryParamsCount = 0;
 
-  // Оставляем схемы, статичные query-параметры которых присутствуют в URL ответа.
+  // Leave schemas whose static parameters are present in the response URL
   foundSchemas = foundSchemas.filter(schema => {
     const allStaticParamsArePresent = schema.staticQueryParams.every(staticParam => (
       responseQueryParams.find(responseParam => (
@@ -124,10 +124,10 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
     return allStaticParamsArePresent;
   });
 
-  // Оставляем схемы с максимальным количеством совпавших статичных query-параметров.
+  // Leave schemas with the maximum number of matching static query parameters.
   foundSchemas = foundSchemas.filter(schema => schema.staticQueryParams.length === maxMatchedStaticQueryParamsCount);
 
-  // Оставляем схемы, обязательные динамические query-параметры которых присутствуют в URL ответа.
+  // Leave schemas whose mandatory dynamic parameters are present in the response URL
   foundSchemas = foundSchemas.filter(schema => (
     schema.requiredDynamicQueryParams.every(schemaParamName => (
       responseQueryParams.find(responseParam => (
@@ -136,7 +136,7 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
     ))
   ));
 
-  // Первой окажется схема, у которой больше всего обязательных динамических query-параметров.
+  // The first one will be the schema which has the maximum number of mandatory dynamic parameters
   foundSchemas.sort((schemaA, schemaB) => (schemaB.requiredDynamicQueryParams.length - schemaA.requiredDynamicQueryParams.length));
 
   if (foundSchemas.length === 0) {

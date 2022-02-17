@@ -5,7 +5,7 @@ export default function getQueryParams(queryString) {
   const params = [];
   queryString.split('&').forEach(param => {
     const [name, value] = param.split('=');
-    // Удаление скобок в нотации массива: "foo[]" и "foo[0]" будут преобразованы в "foo".
+    // Delete square brackets from the array signature: "foo[]" and "foo[0]" will be transformed to "foo".
     const nameWithoutBrackets = name.replace(/\[[^\]]*\]$/, '');
     params.push({
       name: nameWithoutBrackets,

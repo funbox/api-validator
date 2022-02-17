@@ -50,9 +50,9 @@ module.exports = async function generateSchemas(doc, isFilePath) {
 
     const hasVariables = /{([^}]+)}/.test(channelTitle);
     if (hasVariables) {
-      // Экранирование специальных символов сегмента, за исключением "{" и "}".
+      // Escape special symbols excluding "{" and "}".
       channel = channel.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
-      // Замена переменных на регулярные выражения.
+      // Replace a dynamic part with a regular expression
       channel = channel.replace(/{([^}]+)}/g, '.+');
       channel = `^${channel}$`;
     }
@@ -130,14 +130,14 @@ module.exports = async function generateSchemas(doc, isFilePath) {
 
             const requiredDynamicQueryParams = dynamicQueryParams.filter(param => requiredVariables.indexOf(param) >= 0);
 
-            // Преобразуем URL в массив сегментов для упрощения кода валидации.
+            // Transform URL into an array of segments to make code simpler
             const urlSegments = hrefWithoutStaticQueryParams.split('/').filter(s => s.length > 0).map(segment => {
               let value = segment;
               const hasVariables = segment.indexOf('{') !== -1;
               if (hasVariables) {
-                // Экранирование специальных символов сегмента, за исключением "{" и "}".
+                // Escape special symbols excluding "{" and "}".
                 value = value.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
-                // Замена переменных на регулярные выражения.
+                // Replace a dynamic part with a regular expression
                 value = value.replace(/{([^}/]+)}/g, (match, name) => variablesRegExps[name] || typesRegExps.string);
                 value = `^${value}$`;
               }
