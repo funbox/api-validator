@@ -8,6 +8,8 @@ export const validationStatus = {
 };
 
 function validate(data, schema) {
+  if (!data && !schema) return { valid: true };
+
   return jsonschema.validate(data, schema, { nestedErrors: true });
 }
 
@@ -79,6 +81,8 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
       return { status: validationStatus.schemaNotFound };
     }
   }
+
+  foundSchemas = foundSchemas.filter(schema => (data ? !!schema.definition : !schema.definition));
 
   // Ищем схемы с подходящими URL: проверяем сегменты по очереди, предпочитая совпадения по статическим сегментам.
   // Например, если пришел ответ с URL "/books/user", и у нас есть две подходящие схемы: "/books/{bookId}" и "/books/user",

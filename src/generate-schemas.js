@@ -86,68 +86,72 @@ module.exports = async function generateSchemas(doc, isFilePath) {
           const request = transaction.content.find((obj) => obj.element === 'httpRequest');
           const response = transaction.content.find((obj) => obj.element === 'httpResponse');
           const schemaElement = response.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
-          if (schemaElement) {
-            const method = request.attributes.method.content;
-            const transitionAttrs = transition.attributes || {};
 
-            const href = (transitionAttrs.href && transitionAttrs.href.content) || resource.attributes.href.content;
-            const hrefWithoutDynamicQueryParams = href.replace(/{[?&][^}]+}/, '');
+          const method = request.attributes.method.content;
+          const transitionAttrs = transition.attributes || {};
 
-            const [hrefWithoutStaticQueryParams, staticQueryString] = hrefWithoutDynamicQueryParams.split('?');
-            const staticQueryParams = getQueryParams(staticQueryString);
+          const href = (transitionAttrs.href && transitionAttrs.href.content) || resource.attributes.href.content;
+          const hrefWithoutDynamicQueryParams = href.replace(/{[?&][^}]+}/, '');
 
-            const dynamicQueryParamsMatch = href.match(/{[?&]([^}]+)}/);
-            const dynamicQueryParams = dynamicQueryParamsMatch ? dynamicQueryParamsMatch[1].split(',') : [];
+          const [hrefWithoutStaticQueryParams, staticQueryString] = hrefWithoutDynamicQueryParams.split('?');
+          const staticQueryParams = getQueryParams(staticQueryString);
 
-            const typesRegExps = {
-              number: '[0-9]+',
-              string: '[^/]+',
-            };
+          const dynamicQueryParamsMatch = href.match(/{[?&]([^}]+)}/);
+          const dynamicQueryParams = dynamicQueryParamsMatch ? dynamicQueryParamsMatch[1].split(',') : [];
 
-            const variablesRegExps = {};
-            const requiredVariables = [];
+          const typesRegExps = {
+            number: '[0-9]+',
+            string: '[^/]+',
+          };
 
-            if (transitionAttrs.hrefVariables) {
-              transitionAttrs.hrefVariables.content.forEach(variable => {
-                const name = variable.content.key.content;
-                const type = variable.meta ? variable.meta.title.content : '';
+          const variablesRegExps = {};
+          const requiredVariables = [];
 
-                let regExp = typesRegExps.string;
-                if (type === 'enum') {
-                  const enumValues = variable.content.value.attributes.enumerations.content.map(it => it.content);
-                  regExp = enumValues.join('|');
-                } else if (type in typesRegExps) {
-                  regExp = typesRegExps[type];
-                }
-                variablesRegExps[name] = regExp;
+          if (transitionAttrs.hrefVariables) {
+            transitionAttrs.hrefVariables.content.forEach(variable => {
+              const name = variable.content.key.content;
+              const type = variable.meta ? variable.meta.title.content : '';
 
-                const isRequired = !!variable.attributes.typeAttributes.content.find(it => it.content === 'required');
-                if (isRequired) {
-                  requiredVariables.push(name);
-                }
-              });
-            }
-
-            const requiredDynamicQueryParams = dynamicQueryParams.filter(param => requiredVariables.indexOf(param) >= 0);
-
-            // Преобразуем URL в массив сегментов для упрощения кода валидации.
-            const urlSegments = hrefWithoutStaticQueryParams.split('/').filter(s => s.length > 0).map(segment => {
-              let value = segment;
-              const hasVariables = segment.indexOf('{') !== -1;
-              if (hasVariables) {
-                // Экранирование специальных символов сегмента, за исключением "{" и "}".
-                value = value.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
-                // Замена переменных на регулярные выражения.
-                value = value.replace(/{([^}/]+)}/g, (match, name) => variablesRegExps[name] || typesRegExps.string);
-                value = `^${value}$`;
+              let regExp = typesRegExps.string;
+              if (type === 'enum') {
+                const enumValues = variable.content.value.attributes.enumerations.content.map(it => it.content);
+                regExp = enumValues.join('|');
+              } else if (type in typesRegExps) {
+                regExp = typesRegExps[type];
               }
-              return { isRegExp: hasVariables, value };
-            });
+              variablesRegExps[name] = regExp;
 
-            const definition = JSON.parse(schemaElement.content);
-            deleteDescriptions(definition);
-            schemas.push({ type: 'rest', method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
+              const isRequired = !!variable.attributes.typeAttributes.content.find(it => it.content === 'required');
+              if (isRequired) {
+                requiredVariables.push(name);
+              }
+            });
           }
+
+          const requiredDynamicQueryParams = dynamicQueryParams.filter(param => requiredVariables.indexOf(param) >= 0);
+
+          // Преобразуем URL в массив сегментов для упрощения кода валидации.
+          const urlSegments = hrefWithoutStaticQueryParams.split('/').filter(s => s.length > 0).map(segment => {
+            let value = segment;
+            const hasVariables = segment.indexOf('{') !== -1;
+            if (hasVariables) {
+              // Экранирование специальных символов сегмента, за исключением "{" и "}".
+              value = value.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
+              // Замена переменных на регулярные выражения.
+              value = value.replace(/{([^}/]+)}/g, (match, name) => variablesRegExps[name] || typesRegExps.string);
+              value = `^${value}$`;
+            }
+            return { isRegExp: hasVariables, value };
+          });
+
+          let definition;
+
+          if (schemaElement) {
+            definition = JSON.parse(schemaElement.content);
+            deleteDescriptions(definition);
+          }
+
+          schemas.push({ type: 'rest', method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
         }
       });
     });
