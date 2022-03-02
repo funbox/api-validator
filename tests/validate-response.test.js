@@ -848,6 +848,53 @@ describe('validateResponse', () => {
       assert.equal(result.status, validationStatus.schemaNotFound);
     });
   });
+
+  describe('Http status code', () => {
+    let schemas;
+
+    beforeEach(async () => {
+      const doc = `
+# My API
+
+# GET /example
+
++ Response 200 (text/plain)
+  Запрос выполнен успешно
+
++ Response 422 (application/json)
+  Ошибка для поля
+    + Attributes
+        + error (string, required)
+      `;
+      schemas = (await generateSchemas(doc)).schemas;
+    });
+
+    it('handles response with valid http status code', () => {
+      const result = validateResponse({
+        method: 'GET',
+        statusCode: 422,
+        url: '/example',
+        data: {
+          error: 'error',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles response with invalid http status code', () => {
+      const result = validateResponse({
+        method: 'GET',
+        statusCode: 200,
+        url: '/example',
+        data: {
+          error: 'error',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
 });
 
 describe('validate WebSocket response', () => {
