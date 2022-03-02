@@ -812,6 +812,42 @@ describe('validateResponse', () => {
     });
     assert.equal(result.status, validationStatus.valid);
   });
+
+  describe('Empty response', () => {
+    let schemas;
+
+    beforeEach(async () => {
+      const doc = `
+# My API
+
+# GET /example
+
++ Response 200 (text/plain)
+      `;
+      schemas = (await generateSchemas(doc)).schemas;
+    });
+
+    it('handles valid empty response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.valid);
+    });
+
+    it('handles invalid response', () => {
+      const result = validateResponse({
+        method: 'GET',
+        url: '/example',
+        data: {
+          status: 'ok',
+        },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+  });
 });
 
 describe('validate WebSocket response', () => {
