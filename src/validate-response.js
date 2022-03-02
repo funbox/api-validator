@@ -58,7 +58,7 @@ export function validateWebsocketResponse({ messageTitle, channel, data = null, 
   };
 }
 
-export function validateResponse({ method, url, data, schemas, basePath = '', statusField = '' } = {}) {
+export function validateResponse({ method, statusCode, url, data, schemas, basePath = '', statusField = '' } = {}) {
   const urlWithoutBasePath = url.slice(basePath.length);
   const [urlWithoutQueryString, queryString] = urlWithoutBasePath.split('?');
   const responseUrlSegments = urlWithoutQueryString.split('/').filter(s => s.length > 0);
@@ -69,6 +69,10 @@ export function validateResponse({ method, url, data, schemas, basePath = '', st
     && schema.method === method
     && schema.urlSegments.length === responseUrlSegments.length
   ));
+
+  if (statusCode) {
+    foundSchemas = schemas.filter(schema => (schema.statusCode === statusCode));
+  }
 
   if (statusField) {
     if (data && data[statusField]) {

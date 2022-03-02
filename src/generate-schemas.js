@@ -88,6 +88,7 @@ module.exports = async function generateSchemas(doc, isFilePath) {
           const schemaElement = response.content.find((obj) => obj.attributes && obj.attributes.contentType && obj.attributes.contentType.content === 'application/schema+json');
 
           const method = request.attributes.method.content;
+          const statusCode = response.attributes.statusCode.content;
           const transitionAttrs = transition.attributes || {};
 
           const href = (transitionAttrs.href && transitionAttrs.href.content) || resource.attributes.href.content;
@@ -151,7 +152,7 @@ module.exports = async function generateSchemas(doc, isFilePath) {
             deleteDescriptions(definition);
           }
 
-          schemas.push({ type: 'rest', method, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
+          schemas.push({ type: 'rest', method, statusCode, urlSegments, staticQueryParams, requiredDynamicQueryParams, definition });
         }
       });
     });
