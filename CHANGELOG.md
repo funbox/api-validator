@@ -1,157 +1,157 @@
-# История изменений проекта
+# Changelog
 
 ## 3.5.0 (13.04.2022)
 
-* Валидация http кода ответа и пустых ответов.
+* Validate http status code and empty responses.
 
 ## 3.4.0 (30.12.2021)
 
-* Замена валидатора json-схем.
+* Change tool for JSON schema validation.
 
 ## 3.3.0 (11.12.2021)
 
-* Добавление Юриста.
+* Add Lawyer.
 
 ## 3.2.2 (08.11.2021)
 
-* Исправление ошибки при обработке nullable oneOf.
+* Fix error caused by parsing of a nullable One Of.
 
 ## 3.2.1 (17.09.2021)
 
-* Актуализация ссылки на репозиторий.
+* Update repository link.
 
 ## 3.2.0 (20.08.2021)
 
-* Изменение форматирования уведомлений о релизах.
+* Change formatting of release notifications.
 
 ## 3.1.0 (18.08.2021)
 
-* Настройка уведомлений о релизах.
+* Notify about new releases.
 
 ## 3.0.1 (19.07.2021)
 
-* Исправление парсинга параметров URI, содержащих символы "~", ".", "-".
+* Fix parsing of URL parameters that contain symbols "~", ".", "-".
 
 ## 3.0.0 (24.06.2021)
 
-* Переход на crafter 3.
+* Use crafter v3.
 
 ## 2.12.0 (18.05.2021)
 
-* Настройка создания релизов при мерже в мастер.
+* Create a new release after merge to the master branch.
 
 ## 2.11.0 (02.04.2021)
 
-* Доработка конфигурации gitlab-ci.
+* Update gitlab-ci config.
 
 ## 2.10.1 (29.03.2021)
 
-* Удаление переменной `no_proxy`.
+* Delete`no_proxy` variable.
 
 ## 2.10.0 (29.03.2021)
 
-* Экспорт функции validateWebsocketResponse из индексного файла.
+* Export validateWebsocketResponse function from the index file.
 
 ## 2.9.3 (24.03.2021)
 
-* Автопубликация пакета.
+* Setup package auto-publication.
 
 ## 2.9.2 (23.03.2021)
 
-* Настройка кэша node_modules.
+* Setup node_modules caching.
 
 ## 2.9.1 (22.03.2021)
 
-* Отключение tags pipeline.
+* Disable pipeline for tags.
 
 ## 2.9.0 (15.03.2021)
 
-* Добавление core-js и regenerator-runtime в peerDependencies.
+* Add core-js and regenerator-runtime to peerDependencies.
 
 ## 2.8.0 (15.03.2021)
 
-* Исправление уязвимостей npm audit.
+* Fix vulnerabilities after npm audit.
 
 ## 2.7.0 (01.01.2021)
 
-* Логирование ошибки парсинга Crafter.
+* Log parsing errors from Crafter.
 
 ## 2.6.2 (22.12.2020)
 
-* Исправление сочетания ref и nullable в json-схемах.
+* Fix combination of ref and nullable in JSON schemas.
 
 ## 2.6.1 (02.12.2020)
 
-* Доработка deleteDescriptions.
+* Improve deleteDescriptions function.
 
 ## 2.6.0 (12.10.2020)
 
-* Использование логгера предупреждений при генерации рефракта.
+* Add a separate logger to output Crafter warnings.
 
 ## 2.5.0 (08.07.2020)
 
-* Улучшение текста `README.md`.
+* Update `README.md` text.
 
 ## 2.4.0 (19.06.2020)
 
-* Оптимизация валидации ответов, имеющих поле status.
+* Optimize validation of responses with the "status" field.
 
 ## 2.3.0 (13.01.2020)
 
-* Актуализация зависимостей.
+* Update dependencies.
 
 ## 2.2.0 (28.06.2019)
 
-* Поддержка websocket-функционала.
+* Add websocket support.
 
 ## 2.1.3 (10.06.2019)
 
-* Проверка ответов любого вида.
+* Check any type of response.
 
 ## 2.1.2 (06.06.2019)
 
-* Добавление core-js в зависимости проекта.
+* Add core-js to dependencies.
 
 ## 2.1.1 (04.06.2019)
 
-* Исправление парсинга пустого тела ответа в crafter.
+* Fix parsing of an empty response body in Crafter.
 
 ## 2.1.0 (13.05.2019)
 
-* Обновление crafter до 1.9.4.
+* Update Crafter to 1.9.4.
 
 ## 2.0.0 (15.04.2019)
 
-* Переход с protagonist на crafter.
+* Reject Protagonist in favor of Crafter.
 
 ## 1.7.0 (30.03.2019)
 
-* Поддержка enum-параметров.
+* Add support of enum parameters.
 
 ## 1.6.0 (05.02.2019)
 
-* Поддержка query-параметров.
+* Add support of query parameters.
 
 ## 1.5.0 (09.01.2019)
 
-* Поддержка node.js 10.
+* Add support of node.js v10.
 
 ## 1.4.0 (09.01.2019)
 
-* Учет пересекающихся урлов.
+* Consider URLs crossover.
 
 ## 1.3.0 (14.12.2018)
 
-* Препроцессинг файлов библиотеки с помощью babel.
+* Preprocess project files with babel.
 
 ## 1.2.0 (29.11.2018)
 
-* Улучшение совместимости с Windows.
+* Improve Windows compatibility.
 
 ## 1.1.0 (23.11.2018)
 
-* Улучшение `readme.md` проекта.
+* Update `readme.md` of the project.
 
 ## 1.0.0 (22.11.2018)
 
-* Начальная версия.
+* Initial version.

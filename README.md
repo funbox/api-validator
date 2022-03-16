@@ -1,14 +1,11 @@
 # @funboxteam/api-validator
 
-## Описание
+**api-validator** is a frontend tool to validate server response against API Blueprint documentation.
 
-**api-validator** — это средство для проверки ответа сервера на соответствие
-документации APIB.
+## Extracting of JSON schemas in frontend projects
 
-## Извлечение JSON-схем API в проекте
-
-1. Добавить в зависимости проекта `@funboxteam/api-validator`.
-2. Добавить в `package.json` проекта поле `doc` вида:
+1. Add `@funboxteam/api-validator` to project dependencies.
+2. Add inside of the `package.json` the next `doc` field:
     ```
     "doc": {
       "repo": "git@github.com:your-username/your-apib-repository.git",
@@ -16,20 +13,20 @@
       "file": "doc.apib"
     }
     ```
-    где:
-    - `repo` — адрес репозитория (обязательное поле);
-    - `branch` — название ветки (обязательное поле);
-    - `file` — название файла внутри репозитория (необязательное поле, по умолчанию `doc.apib`).
-3. Добавить в `scripts` в `package.json` проекта команду:
+    where:
+    - `repo` — repository URL (required);
+    - `branch` — target branch name (required);
+    - `file` — file name in the repository (optional, default is `doc.apib`).
+3. Add the next script to the `package.json`:
     ```
     "update-schemas": "update-schemas"
     ```
-4. Запустить обновление схем командой `npm run update-schemas`.
-   Команда сохранит в папке проекта файлы:
-   - `src/api-schemas/schemas.json` (содержит схемы);
-   - `src/api-schemas/doc-version.txt` (содержит ID коммита, использованного при создании схем).
+4. Run `npm run update-schemas` to generate schemas or to update existing.
+   This command will add required files in the project:
+   - `src/api-schemas/schemas.json` (contains schemas);
+   - `src/api-schemas/doc-version.txt` (contains the commit ID used to generate schemas).
 
-## Проверка ответов сервера в React-проектах
+## Example of validation in React projects
 
 ```javascript
 import axios from 'axios';
@@ -48,13 +45,13 @@ axios.interceptors.response.use(response => {
 
   switch (result.status) {
     case validationStatus.invalid: {
-      console.log(`Ошибка валидации ${response.config.method} ${response.config.url}`);
+      console.log(`Validation error in ${response.config.method} ${response.config.url}`);
       console.log(result);
       return Promise.reject();
     }
 
     case validationStatus.schemaNotFound: {
-      console.log(`Не найдена схема ${response.config.method} ${response.config.url}.`);
+      console.log(`No schema for ${response.config.method} ${response.config.url}.`);
       return Promise.reject();
     }
   }
@@ -63,7 +60,7 @@ axios.interceptors.response.use(response => {
 });
 ```
 
-## Проверка ответов сервера в Angular-проектах
+## Example of validation in Angular projects
 
 ```javascript
 import schemas from 'api-schemas/schemas';
@@ -84,14 +81,14 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 
       switch (result.status) {
         case validationStatus.invalid: {
-          console.log(`Ошибка валидации ${response.config.method} ${response.config.url}`);
+          console.log(`Validation error in ${response.config.method} ${response.config.url}`);
           console.log(result);
           respWrapper.isSuccessful = false;
           break;
         }
 
         case validationStatus.schemaNotFound: {
-          console.log(`Не найдена схема ${response.config.method} ${response.config.url}.`);
+          console.log(`No schema for ${response.config.method} ${response.config.url}.`);
           respWrapper.isSuccessful = false;
           break;
         }
@@ -101,10 +98,9 @@ angular.module('app').config(['restfulProvider', 'settings', (restfulProvider, s
 }]);
 ```
 
-## Проверка ответов сервера для WebSocket-соединения
+## Example of validation for WebSocket connections
 
-В качестве примера используется JavaScript-клиент фреймворка
-[Phoenix](https://hexdocs.pm/phoenix/js/):
+This example is based on JavaScript client of the [Phoenix](https://hexdocs.pm/phoenix/js/) framework:
 
 ```javascript
 import schemas from 'api-schemas/schemas';
@@ -126,14 +122,14 @@ channel.onMessage = (message, payload) => { // https://hexdocs.pm/phoenix/js/#ch
   });
   switch (result.status) {
     case validationStatus.valid:
-      console.log(`Схема сообщения ${message} в канале ${channel.topic} найдена и валидна`);
+      console.log(`Schema of the message ${message} in the channel ${channel.topic} is valid`);
       return payload;
     case validationStatus.invalid:
-      console.warn(`Ошибка валидации сообщения ${message} в канале ${channel.topic}`);
+      console.warn(`Error during validation of the message ${message} in the channel ${channel.topic}`);
       console.log(result);
       return payload;
     case validationStatus.schemaNotFound:
-      console.warn(`Не найдена схема сообщения ${message} в канале ${channel.topic}`);
+      console.warn(`Schema of the message ${message} in the channel ${channel.topic} not found`);
       return payload;
     default:
       return payload;
