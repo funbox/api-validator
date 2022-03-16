@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/@funbox/eslint-config/.eslintrc.js",
+  "extends": "./node_modules/@funboxteam/eslint-config/.eslintrc.js",
   "settings": {
     "import/resolver": {
       "node": {

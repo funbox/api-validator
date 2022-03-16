@@ -1,5 +1,5 @@
 {
-  "name": "@funbox/api-validator",
+  "name": "@funboxteam/api-validator",
   "version": "3.5.0",
   "description": "Средство проверки соответствия ответа от сервера документации apib",
   "main": "dist/index.js",
@@ -18,7 +18,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@funbox/crafter": "3.4.2",
+    "@funboxteam/crafter": "3.4.2",
     "jsonschema": "1.4.0",
     "rimraf": "3.0.0"
   },
@@ -27,7 +27,7 @@
     "@babel/core": "7.12.10",
     "@babel/preset-env": "7.12.10",
     "@babel/register": "7.12.10",
-    "@funbox/eslint-config": "4.14.0",
+    "@funboxteam/eslint-config": "7.1.0",
     "core-js": "3.6.3",
     "eslint": "6.8.0",
     "mocha": "8.3.2"
