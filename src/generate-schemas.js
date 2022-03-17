@@ -44,7 +44,7 @@ module.exports = async function generateSchemas(doc, isFilePath) {
     let channel = channelTitle;
 
     if (!channelTitle) {
-      console.log('Заголовок секции «SubGroup» отсутствует и не может быть использован для валидации канала.');
+      console.log('A header of a Subgroup section is not found and cannot be used for validation purposes');
       process.exit(1);
     }
 
