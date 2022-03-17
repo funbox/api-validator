@@ -1,7 +1,8 @@
 {
   "name": "@funboxteam/api-validator",
   "version": "3.5.0",
-  "description": "Средство проверки соответствия ответа от сервера документации apib",
+  "description": "A tool to validate server response against API Blueprint documentation",
+  "author": "FunBox LLC <wanted@fun-box.ru> (https://funbox.ru)",
   "main": "dist/index.js",
   "bin": {
     "update-schemas": "./dist/update-schemas.js"
@@ -16,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/funbox/api-validator"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@funboxteam/crafter": "3.4.2",
     "jsonschema": "1.4.0",
