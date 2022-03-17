@@ -449,7 +449,7 @@ describe('validateResponse', () => {
   });
 
   it('handles parameters without attributes', async () => {
-    // Проверяем, что корректно обрабатывается параметр hello, у которого в Parameters не указаны атрибуты в скобках.
+    // Check that the tool can correctly process the "hello" parameter, for which the attributes in brackets are not specified
     const doc = `
 # My API
 
