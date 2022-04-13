@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.0 (13.04.2022)
+
+* Validate http status code and empty responses.
+
 ## 3.4.0 (30.12.2021)
 
 * Change tool for JSON schema validation.
