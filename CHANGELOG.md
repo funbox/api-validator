@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.0 (11.05.2022)
+
+Published the package on Github and added a LICENSE file.
+
+
 ## 3.5.0 (13.04.2022)
 
 * Validate http status code and empty responses.
