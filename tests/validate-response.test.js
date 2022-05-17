@@ -859,10 +859,10 @@ describe('validateResponse', () => {
 # GET /example
 
 + Response 200 (text/plain)
-  Запрос выполнен успешно
+  Successful request
 
 + Response 422 (application/json)
-  Ошибка для поля
+  Field error
     + Attributes
         + error (string, required)
       `;
@@ -890,6 +890,16 @@ describe('validateResponse', () => {
         data: {
           error: 'error',
         },
+        schemas,
+      });
+      assert.equal(result.status, validationStatus.schemaNotFound);
+    });
+
+    it('handles URL check properly when status code is passed', () => {
+      const result = validateResponse({
+        method: 'GET',
+        statusCode: 200,
+        url: '/example/id',
         schemas,
       });
       assert.equal(result.status, validationStatus.schemaNotFound);
