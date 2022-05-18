@@ -71,7 +71,7 @@ export function validateResponse({ method, statusCode, url, data, schemas, baseP
   ));
 
   if (statusCode) {
-    foundSchemas = schemas.filter(schema => (schema.statusCode === statusCode));
+    foundSchemas = foundSchemas.filter(schema => (schema.statusCode === statusCode));
   }
 
   if (statusField) {

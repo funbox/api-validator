@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.1 (18.05.2022)
+
+`validateResponse` function worked incorrectly when `statusCode` was passed.
+
+Now it works fine.
+
+
 ## 4.0.0 (11.05.2022)
 
 Published the package on Github and added a LICENSE file.
