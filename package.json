@@ -8,7 +8,7 @@
     "update-schemas": "./dist/update-schemas.js"
   },
   "scripts": {
-    "prepublishOnly": "lawyer && npm run build",
+    "prepublishOnly": "if [ -z \"$CI\" ]; then lawyer; fi && npm run build",
     "build": "./node_modules/.bin/babel src --out-dir dist",
     "test": "mocha --require @babel/register tests/*.test.js",
     "lint": "eslint --cache -c .eslintrc --ext .js ./src ./tests"
