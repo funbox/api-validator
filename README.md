@@ -17,7 +17,7 @@ correspondence between the backend response and the documentation for this reque
 ## Installation
 
 ```bash
-npm install --save @funboxteam/api-blueprint
+npm install --save @funboxteam/api-validator
 ```
 
 ## Usage
