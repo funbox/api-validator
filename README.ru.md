@@ -15,7 +15,7 @@
 ## Установка
 
 ```bash
-npm install --save @funboxteam/api-blueprint
+npm install --save @funboxteam/api-validator
 ```
 
 ## Использование
