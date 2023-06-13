@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const child_process = require('child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const child_process = require('node:child_process');
 const rimraf = require('rimraf');
 const generateSchemas = require('./generate-schemas');
 const { logCrafterError } = require('./utils');

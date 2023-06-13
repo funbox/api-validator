@@ -1,6 +1,6 @@
-import getQueryParams from './get-query-params';
-
 const Crafter = require('@funboxteam/crafter');
+
+const getQueryParams = require('./get-query-params').default;
 const {
   astHasError,
   deleteDescriptions,
