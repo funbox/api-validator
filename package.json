@@ -19,7 +19,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@funboxteam/crafter": "4.0.0",
+    "@funboxteam/crafter": "6.0.0",
     "jsonschema": "1.4.0",
     "rimraf": "3.0.0"
   },
