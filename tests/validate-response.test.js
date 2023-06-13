@@ -925,7 +925,7 @@ describe('validate WebSocket response', () => {
 
 ### Message
 
-+ Attributes(string, required)
++ Attributes (string)
 `;
       schemas = (await generateSchemas(doc)).schemas;
     });
