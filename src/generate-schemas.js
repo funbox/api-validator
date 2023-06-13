@@ -1,4 +1,4 @@
-import getQueryParams from './get-query-params';
+const getQueryParams = require('./get-query-params').default;
 
 const Crafter = require('@funboxteam/crafter');
 const {
