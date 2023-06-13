@@ -1,5 +1,5 @@
-const path = require('path');
-const fs = require('fs').promises;
+const path = require('node:path');
+const fs = require('node:fs').promises;
 
 const ERROR_LINES_PADDING = 4;
 const ROW_HIGHLIGHT_MARK = '>';

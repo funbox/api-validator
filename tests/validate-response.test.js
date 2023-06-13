@@ -1,6 +1,6 @@
 import { validationStatus, validateResponse, validateWebsocketResponse } from '../src/validate-response';
 
-const assert = require('assert');
+const assert = require('node:assert');
 const generateSchemas = require('../src/generate-schemas');
 
 describe('validateResponse', () => {
