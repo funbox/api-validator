@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.0.0 (13.06.2023)
+
+Updated @funboxteam/crafter from 4.0.0 to 6.0.0, which led to Node.js 12 support drop.
+
+Checkout the [migration guide](./MIGRATION.md).
+
+
 ## 4.0.1 (18.05.2022)
 
 `validateResponse` function worked incorrectly when `statusCode` was passed.
