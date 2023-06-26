@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const child_process = require('node:child_process');
-const rimraf = require('rimraf');
+const { rimrafSync } = require('rimraf');
 const generateSchemas = require('./generate-schemas');
 const { logCrafterError } = require('./utils');
 
@@ -65,13 +65,13 @@ async function main() {
     console.log(`Parsing error for ${file}, rollback changes.`);
     logCrafterError(filePath, error).then(() => {
       if (basePathCreated) {
-        rimraf.sync(basePath);
+        rimrafSync(basePath);
       }
-      rimraf.sync(repoPath);
+      rimrafSync(repoPath);
     });
     return;
   }
-  rimraf.sync(repoPath);
+  rimrafSync(repoPath);
 
   const schemasPath = path.resolve(basePath, 'schemas.js');
   console.log(`Save schemas into ${schemasPath}`);
