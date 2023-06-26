@@ -21,7 +21,7 @@
   "dependencies": {
     "@funboxteam/crafter": "6.0.0",
     "jsonschema": "1.4.0",
-    "rimraf": "3.0.0"
+    "rimraf": "5.0.1"
   },
   "devDependencies": {
     "@babel/cli": "7.17.6",
