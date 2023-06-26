@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.1 (26.06.2023)
+
+Fixed a vulnerability caused by a dependency of the "rimraf" package.
+Rimraf updated to a major version, but this does not affect the end user of this package.
+
+
 ## 5.0.0 (13.06.2023)
 
 Updated @funboxteam/crafter from 4.0.0 to 6.0.0, which led to Node.js 12 support drop.
