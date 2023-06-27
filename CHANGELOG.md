@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.2 (27.06.2023)
+
+Updated @funboxteam/crafter from 6.0.0 to 6.0.1.
+
+
 ## 5.0.1 (26.06.2023)
 
 Fixed a vulnerability caused by a dependency of the "rimraf" package.

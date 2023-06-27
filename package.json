@@ -1,6 +1,6 @@
 {
   "name": "@funboxteam/api-validator",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "A tool to validate server response against API Blueprint documentation",
   "author": "FunBox LLC <wanted@fun-box.ru> (https://funbox.ru)",
   "main": "dist/index.js",
@@ -19,7 +19,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@funboxteam/crafter": "6.0.0",
+    "@funboxteam/crafter": "6.0.1",
     "jsonschema": "1.4.0",
     "rimraf": "5.0.1"
   },
