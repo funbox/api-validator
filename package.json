@@ -1,6 +1,6 @@
 {
   "name": "@funboxteam/api-validator",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "A tool to validate server response against API Blueprint documentation",
   "author": "FunBox LLC <wanted@fun-box.ru> (https://funbox.ru)",
   "main": "dist/index.js",
