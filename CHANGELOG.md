@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.3 (30.06.2023)
+
+Updated @funboxteam/crafter from 6.0.1 to 6.0.2.
+
+
 ## 5.0.2 (27.06.2023)
 
 Updated @funboxteam/crafter from 6.0.0 to 6.0.1.
